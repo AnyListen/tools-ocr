@@ -20,6 +20,8 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 import org.jnativehook.GlobalScreen;
 
@@ -69,6 +71,7 @@ public class MainFm extends Application {
 
         textArea = new TextArea();
         textArea.setWrapText(true);
+        textArea.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
 
         ToolBar footer = WidgetFactory.statsFooter(textArea.textProperty());
         BorderPane root = new BorderPane();
@@ -96,7 +99,7 @@ public class MainFm extends Application {
                 Method getApplication = appleApp.getMethod("getApplication");
                 Object application = getApplication.invoke(appleApp);
                 Class params[] = new Class[1];
-                params[0] = Image.class;
+                params[0] = java.awt.Image.class;
                 //noinspection unchecked
                 Method setDockIconImage = appleApp.getMethod("setDockIconImage", params);
                 setDockIconImage.invoke(application, image);
