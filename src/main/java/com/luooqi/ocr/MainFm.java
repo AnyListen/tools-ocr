@@ -81,7 +81,7 @@ public class MainFm extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        primaryStage.setTitle("天若OCR");
+        primaryStage.setTitle("树洞OCR文字识别");
         primaryStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
         Scene mainScene = new Scene(root, 700, 504);
         stage.setScene(mainScene);
@@ -97,8 +97,14 @@ public class MainFm extends Application {
         textArea.setText("");
     }
 
-    private void pasteText(){
-        textArea.setText(textArea.getText() + "\n" + Clipboard.getSystemClipboard().getString());
+    private void pasteText() {
+        String text = Clipboard.getSystemClipboard().getString();
+        if (StrUtil.isBlank(text)) {
+            return;
+        }
+        textArea.setText(textArea.getText()
+                + (StrUtil.isBlank(textArea.getText()) ? "" : "\n")
+                + Clipboard.getSystemClipboard().getString());
     }
 
     private void copyText(){
