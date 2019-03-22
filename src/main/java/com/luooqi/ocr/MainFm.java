@@ -1,10 +1,15 @@
 package com.luooqi.ocr;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.controller.CaptureWindowController;
 import com.luooqi.ocr.utils.GlobalKeyListener;
 import com.luooqi.ocr.utils.WidgetFactory;
 import javafx.application.Application;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -19,6 +24,7 @@ import javafx.stage.Stage;
 import org.jnativehook.GlobalScreen;
 
 import javax.swing.*;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,13 +41,13 @@ public class MainFm extends Application {
     }
 
     public static Stage stage;
+    public static TextArea textArea;
     private static CaptureWindowController captureWindowController;
-    private TextArea textArea;
+    public static BooleanProperty isOcr = new SimpleBooleanProperty(false);
 
     @Override
     public void start(Stage primaryStage) {
         initKeyHook();
-
         try {
             stage = primaryStage;
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CaptureWindow.fxml"));
@@ -62,6 +68,8 @@ public class MainFm extends Application {
         topBar.setPadding(new Insets(6, 8, 6, 8));
 
         textArea = new TextArea();
+        textArea.setWrapText(true);
+
         ToolBar footer = WidgetFactory.statsFooter(textArea.textProperty());
         BorderPane root = new BorderPane();
         root.setTop(topBar);
@@ -71,21 +79,33 @@ public class MainFm extends Application {
                 getClass().getResource("/css/main.css").toExternalForm()
         );
 
+        initStage(primaryStage);
+        Scene mainScene = new Scene(root, 420, 475);
+        stage.setScene(mainScene);
+        stage.show();
+    }
+
+    private void initStage(Stage primaryStage) {
         try {
             String osName = System.getProperty("os.name", "generic").toLowerCase();
             if ((osName.contains("mac")) || (osName.contains("darwin"))) {
                 URL iconURL = MainFm.class.getResource("/img/logo.png");
                 java.awt.Image image = new ImageIcon(iconURL).getImage();
-                com.apple.eawt.Application.getApplication().setDockIconImage(image);
+                Class appleApp = Class.forName("com.apple.eawt.Application");
+                //noinspection unchecked
+                Method getApplication = appleApp.getMethod("getApplication");
+                Object application = getApplication.invoke(appleApp);
+                Class params[] = new Class[1];
+                params[0] = Image.class;
+                //noinspection unchecked
+                Method setDockIconImage = appleApp.getMethod("setDockIconImage", params);
+                setDockIconImage.invoke(application, image);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            StaticLog.error(e);
         }
         primaryStage.setTitle("树洞OCR文字识别");
         primaryStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
-        Scene mainScene = new Scene(root, 700, 504);
-        stage.setScene(mainScene);
-        stage.show();
     }
 
     @Override

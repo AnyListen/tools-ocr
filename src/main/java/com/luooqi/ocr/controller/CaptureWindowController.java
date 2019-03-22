@@ -3,10 +3,9 @@ package com.luooqi.ocr.controller;
 
 import com.luooqi.ocr.MainFm;
 import com.luooqi.ocr.model.CaptureWindowModel;
+import com.luooqi.ocr.utils.OcrUtils;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -53,11 +52,6 @@ public class CaptureWindowController extends Stage {
 	private CaptureWindowModel data = new CaptureWindowModel();
 
 	/**
-	 * The capture service.
-	 */
-	private final CaptureService captureService = new CaptureService();
-
-	/**
 	 * The graphics context of the canvas
 	 */
 	private GraphicsContext gc;
@@ -66,7 +60,6 @@ public class CaptureWindowController extends Stage {
 	 * When a key is being pressed into the capture window then this Animation Timer is doing it's magic.
 	 */
 	private AnimationTimer yPressedAnimation = new AnimationTimer() {
-
 		private long nextSecond = 0L;
 		private long precisionLevel;
 
@@ -79,10 +72,6 @@ public class CaptureWindowController extends Stage {
 
 		@Override
 		public void handle(long nanos) {
-
-			//System.out.println("TimeStamp: " + nanos + " Current: " + nextSecond);
-			//System.out.println("Milliseconds Delay: " + precisionLevel / 1_000_000);
-
 			if (nanos >= nextSecond) {
 				nextSecond = nanos + precisionLevel;
 
@@ -158,7 +147,6 @@ public class CaptureWindowController extends Stage {
 						}
 					}
 				}
-
 				repaintCanvas();
 			}
 		}
@@ -181,8 +169,6 @@ public class CaptureWindowController extends Stage {
 			frameCount++;
 			if (frameCount >= 5) {
 				stop();
-
-				// Capture the Image
 				BufferedImage image;
 				int[] rect = getRectangleBounds();
 				try {
@@ -193,7 +179,14 @@ public class CaptureWindowController extends Stage {
 				} finally {
 					mainCanvas.setDisable(false);
 				}
-				captureService.startService(image);
+				MainFm.stage.show();
+				close();
+				Platform.runLater(() -> {
+					MainFm.isOcr.setValue(true);
+					byte[] bytes = OcrUtils.imageToBytes(image);
+					MainFm.isOcr.setValue(false);
+					MainFm.textArea.setText(OcrUtils.sogouWebOcr(bytes));
+				});
 			}
 		}
 	};
@@ -244,12 +237,15 @@ public class CaptureWindowController extends Stage {
 		});
 
 		// graphics context 2D
+		initGraphContent();
+		// HideFeaturesPressed
+		data.hideExtraFeatures.addListener((observable, oldValue, newValue) -> repaintCanvas());
+	}
+
+	private void initGraphContent() {
 		gc = mainCanvas.getGraphicsContext2D();
 		gc.setLineDashes(6);
 		gc.setFont(Font.font("null", FontWeight.BOLD, 14));
-
-		// HideFeaturesPressed
-		data.hideExtraFeatures.addListener((observable, oldValue, newValue) -> repaintCanvas());
 	}
 
 	/**
@@ -279,7 +275,6 @@ public class CaptureWindowController extends Stage {
 		// 4->when the user is pressing DOWN ARROW -> The rectangle is
 		// decreasing from the DOWN side
 
-		// kemodel.yPressed
 		getScene().setOnKeyPressed(key -> {
 			if (key.isShiftDown())
 				data.shiftPressed.set(true);
@@ -303,9 +298,9 @@ public class CaptureWindowController extends Stage {
 
 		// keyReleased
 		getScene().setOnKeyReleased(key -> {
-
-			if (key.getCode() == KeyCode.SHIFT)
+			if (key.getCode() == KeyCode.SHIFT) {
 				data.shiftPressed.set(false);
+			}
 
 			if (key.getCode() == KeyCode.RIGHT) {
 				if (key.isControlDown()) {
@@ -339,42 +334,28 @@ public class CaptureWindowController extends Stage {
 				data.downPressed.set(false);
 			}
 
-			if (key.getCode() == KeyCode.A && key.isControlDown())
+			if (key.getCode() == KeyCode.A && key.isControlDown()) {
 				selectWholeScreen();
+			}
 
-			if (key.getCode() == KeyCode.H)
+			if (key.getCode() == KeyCode.H) {
 				data.hideExtraFeatures.set(false);
+			}
 
 			if (key.getCode() == KeyCode.ESCAPE || key.getCode() == KeyCode.BACK_SPACE) {
-
-				// Stop Counting Thread
-				if (countingThread != null)
+				if (countingThread != null){
 					countingThread.interrupt();
-
-				// Stop MaryTTS
-				//Main.textToSpeech.stopSpeaking();
-
-				// Deactivate all keys
+				}
 				deActivateAllKeys();
-
-				// show the appropriate windows
 				MainFm.stage.show();
 				close();
 			} else if (key.getCode() == KeyCode.ENTER || key.getCode() == KeyCode.SPACE) {
-				// Stop MaryTTS
-				//Main.textToSpeech.stopSpeaking();
-
-				// Deactivate all keys
 				deActivateAllKeys();
-
-				// Capture Selected Area
 				prepareImage();
 			}
-
 		});
 
 		data.anyPressed.addListener((obs, wasPressed, isNowPressed) ->
-
 		{
 			if (isNowPressed) {
 				yPressedAnimation.start();
@@ -400,10 +381,10 @@ public class CaptureWindowController extends Stage {
 	 * Creates and saves the image.
 	 */
 	private void prepareImage() {
-		if ((countingThread != null && countingThread.isAlive()) || captureService.isRunning()) {
+		//if ((countingThread != null && countingThread.isAlive()) || captureService.isRunning()) {
+		if ((countingThread != null && countingThread.isAlive())) {
 			return;
 		}
-
 		countingThread = new Thread(() -> {
 			mainCanvas.setDisable(true);
 			if (!Thread.interrupted()) {
@@ -421,13 +402,10 @@ public class CaptureWindowController extends Stage {
 	 * Repaint the canvas of the capture window.
 	 */
 	private void repaintCanvas() {
-
 		gc.clearRect(0, 0, getWidth(), getHeight());
 		gc.setFill(Color.rgb(0, 0, 0, 0.8));
 		gc.fillRect(0, 0, getWidth(), getHeight());
-
 		gc.setFont(data.font);
-
 		// draw the actual rectangle
 		gc.setStroke(Color.RED);
 		// gc.setFill(model.background)
@@ -455,20 +433,14 @@ public class CaptureWindowController extends Stage {
 		gc.clearRect(data.rectUpperLeftX, data.rectUpperLeftY, data.rectWidth, data.rectHeight);
 
 		// draw the text
-		if (!data.hideExtraFeatures.getValue()) {
-
-			// Show the Size
+		if (!data.hideExtraFeatures.getValue() && (data.rectWidth > 0 ||  data.rectHeight > 0)) {
 			double middle = data.rectUpperLeftX + data.rectWidth / 2.00;
 			gc.setLineWidth(1);
-			//			gc.setStroke(Color.FIREBRICK);
-			//			gc.strokeRect(middle - 78,
-			//			        model.rectUpperLeftY < 25 ? model.rectUpperLeftY + 2 : model.rectUpperLeftY - 26.00, 79, 25);
 			gc.setFill(Color.FIREBRICK);
 			gc.fillRect(middle - 77, data.rectUpperLeftY < 50 ? data.rectUpperLeftY + 2 : data.rectUpperLeftY - 18.00, 100, 18);
 			gc.setFill(Color.WHITE);
 			gc.fillText(data.rectWidth + " * " + data.rectHeight, middle - 77 + 9,
 					data.rectUpperLeftY < 50 ? data.rectUpperLeftY + 17.00 : data.rectUpperLeftY - 4.00);
-
 		}
 	}
 
@@ -487,6 +459,7 @@ public class CaptureWindowController extends Stage {
 	 * Prepares the Window for the User.
 	 */
 	public void prepareForCapture() {
+		data = new CaptureWindowModel();
 		show();
 		repaintCanvas();
 		MainFm.stage.close();
@@ -500,69 +473,4 @@ public class CaptureWindowController extends Stage {
 	private int[] getRectangleBounds() {
 		return new int[]{data.rectUpperLeftX, data.rectUpperLeftY, data.rectWidth, data.rectHeight};
 	}
-
-	/**
-	 * The work of the Service is to capture the Image based on the rectangle that user drawn of the Screen.
-	 *
-	 * @author GOXR3PLUS
-	 */
-	public class CaptureService extends Service<Boolean> {
-
-		/**
-		 * The image.
-		 */
-		BufferedImage image;
-
-		/**
-		 * Constructor.
-		 */
-		CaptureService() {
-
-			setOnSucceeded(s -> done());
-
-			setOnCancelled(c -> done());
-
-			setOnFailed(f -> done());
-
-		}
-
-		/**
-		 * Starts the Service.
-		 *
-		 * @param image2 The image to be saved.
-		 */
-		void startService(BufferedImage image2) {
-			if (isRunning()) {
-				return;
-			}
-
-			this.image = image2;
-			//todo dealImage
-			repaintCanvas();
-			reset();
-			start();
-		}
-
-		/**
-		 * Service has been done.
-		 */
-		private void done() {
-			MainFm.stage.show();
-			close();
-		}
-
-		@Override
-		protected Task<Boolean> createTask() {
-			return new Task<Boolean>() {
-				@Override
-				protected Boolean call() {
-					//todo 处理截图
-					return true;
-				}
-
-			};
-		}
-
-	}
-
 }
