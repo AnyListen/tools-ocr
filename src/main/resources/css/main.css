@@ -1,0 +1,42 @@
+#menuBar {
+    -fx-background-color: rgb(57,73,171);
+}
+
+#menuBar .label {
+    -fx-text-fill: rgb(255, 255, 255);
+    -fx-padding: 4 8 4 8;
+}
+
+#menuBar #mainMenuOption .label {
+    -fx-font-family: 'sans-serif';
+    -fx-font-weight: bold;
+}
+
+.menu-item .label {
+    -fx-text-fill: rgb(0, 0, 0) !important;
+}
+
+.button.pressed { -fx-background-color: ghostwhite; }
+
+.button, .toggle-button {
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 18px 18px;
+    -fx-cursor: pointer;
+}
+
+#snapBtn{
+    -fx-background-image: url(/img/screenshot.png);
+}
+
+#clearBtn{
+     -fx-background-image: url(/img/clear.png);
+ }
+
+#copyBtn{
+    -fx-background-image: url(/img/copy.png);
+}
+
+#pasteBtn{
+    -fx-background-image: url(/img/paste.png);
+}
