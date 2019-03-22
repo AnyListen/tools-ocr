@@ -11,6 +11,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
@@ -202,6 +203,8 @@ public class CaptureWindowController extends Stage {
 	public CaptureWindowController() {
 		setX(0);
 		setY(0);
+        setTitle("树洞OCR文字识别");
+        getIcons().add(new Image(MainFm.class.getResource("/img/logo.png").toExternalForm()));
 		initStyle(StageStyle.TRANSPARENT);
 		setAlwaysOnTop(true);
 	}
