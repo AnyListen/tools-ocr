@@ -15,6 +15,9 @@ public class GlobalKeyListener implements NativeKeyListener {
         if (e.getKeyCode() == NativeKeyEvent.VC_F4){
             MainFm.doSnap();
         }
+        else if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE){
+            MainFm.cancelSnap();
+        }
     }
 
     @Override

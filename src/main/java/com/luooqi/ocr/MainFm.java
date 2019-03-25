@@ -3,18 +3,17 @@ package com.luooqi.ocr;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.controller.CaptureWindowController;
+import com.luooqi.ocr.utils.CommUtils;
 import com.luooqi.ocr.utils.GlobalKeyListener;
-import com.luooqi.ocr.utils.WidgetFactory;
+import com.luooqi.ocr.utils.OcrUtils;
 import javafx.application.Application;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
@@ -26,6 +25,7 @@ import javafx.stage.Stage;
 import org.jnativehook.GlobalScreen;
 
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
@@ -59,25 +59,34 @@ public class MainFm extends Application {
         catch (Exception e) {
             exit();
         }
+
         HBox topBar = new HBox(
-                WidgetFactory.createButton("snapBtn", 28, MainFm::doSnap, "截图"),
-                WidgetFactory.createButton("copyBtn", 28, this::copyText, "复制"),
-                WidgetFactory.createButton("pasteBtn", 28, this::pasteText, "粘贴"),
-                WidgetFactory.createButton("clearBtn", 28, this::clearText, "清空")
+                CommUtils.createButton("snapBtn", 28, MainFm::doSnap, "截图"),
+                CommUtils.createButton("copyBtn", 28, this::copyText, "复制"),
+                CommUtils.createButton("pasteBtn", 28, this::pasteText, "粘贴"),
+                CommUtils.createButton("clearBtn", 28, this::clearText, "清空"),
+                CommUtils.createButton("wrapBtn", 28, this::wrapText, "换行")
         );
         topBar.setMinHeight(40);
         topBar.setSpacing(10);
         topBar.setPadding(new Insets(6, 8, 6, 8));
 
         textArea = new TextArea();
-        textArea.setWrapText(true);
         textArea.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
 
-        ToolBar footer = WidgetFactory.statsFooter(textArea.textProperty());
+
+        ToolBar footerBar = new ToolBar();
+        footerBar.setId("statsToolbar");
+        Label statsLabel = new Label();
+        SimpleStringProperty statsProperty = new SimpleStringProperty("总字数：0");
+        textArea.textProperty().addListener((observable, oldValue, newValue) -> statsProperty.set("总字数：" + newValue.replaceAll("\\s+", "").length()));
+        statsLabel.textProperty().bind(statsProperty);
+        footerBar.getItems().add(statsLabel);
+
         BorderPane root = new BorderPane();
         root.setTop(topBar);
         root.setCenter(textArea);
-        root.setBottom(footer);
+        root.setBottom(footerBar);
         root.getStylesheets().addAll(
                 getClass().getResource("/css/main.css").toExternalForm()
         );
@@ -86,6 +95,10 @@ public class MainFm extends Application {
         Scene mainScene = new Scene(root, 420, 475);
         stage.setScene(mainScene);
         stage.show();
+    }
+
+    private void wrapText() {
+        textArea.setWrapText(!textArea.isWrapText());
     }
 
     private void initStage(Stage primaryStage) {
@@ -98,7 +111,7 @@ public class MainFm extends Application {
                 //noinspection unchecked
                 Method getApplication = appleApp.getMethod("getApplication");
                 Object application = getApplication.invoke(appleApp);
-                Class params[] = new Class[1];
+                Class[] params = new Class[1];
                 params[0] = java.awt.Image.class;
                 //noinspection unchecked
                 Method setDockIconImage = appleApp.getMethod("setDockIconImage", params);
@@ -145,6 +158,17 @@ public class MainFm extends Application {
 
     public static void doSnap() {
         runLater(captureWindowController::prepareForCapture);
+    }
+
+    public static void cancelSnap() {
+        runLater(captureWindowController::cancelSnap);
+    }
+
+    public static void doOCR(BufferedImage image) {
+        isOcr.setValue(true);
+        byte[] bytes = CommUtils.imageToBytes(image);
+        isOcr.setValue(false);
+        textArea.setText(OcrUtils.sogouWebOcr(bytes));
     }
 
     private static void initKeyHook(){

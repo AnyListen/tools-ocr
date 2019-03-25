@@ -40,3 +40,7 @@
 #pasteBtn{
     -fx-background-image: url(/img/paste.png);
 }
+
+#wrapBtn{
+    -fx-background-image: url(/img/wrap.png);
+}

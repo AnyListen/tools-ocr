@@ -3,6 +3,7 @@ package com.luooqi.ocr.controller;
 
 import com.luooqi.ocr.MainFm;
 import com.luooqi.ocr.model.CaptureWindowModel;
+import com.luooqi.ocr.utils.CommUtils;
 import com.luooqi.ocr.utils.OcrUtils;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -183,10 +184,7 @@ public class CaptureWindowController extends Stage {
 				MainFm.stage.show();
 				close();
 				Platform.runLater(() -> {
-					MainFm.isOcr.setValue(true);
-					byte[] bytes = OcrUtils.imageToBytes(image);
-					MainFm.isOcr.setValue(false);
-					MainFm.textArea.setText(OcrUtils.sogouWebOcr(bytes));
+					MainFm.doOCR(image);
 				});
 			}
 		}
@@ -346,12 +344,7 @@ public class CaptureWindowController extends Stage {
 			}
 
 			if (key.getCode() == KeyCode.ESCAPE || key.getCode() == KeyCode.BACK_SPACE) {
-				if (countingThread != null){
-					countingThread.interrupt();
-				}
-				deActivateAllKeys();
-				MainFm.stage.show();
-				close();
+				cancelSnap();
 			} else if (key.getCode() == KeyCode.ENTER || key.getCode() == KeyCode.SPACE) {
 				deActivateAllKeys();
 				prepareImage();
@@ -366,6 +359,16 @@ public class CaptureWindowController extends Stage {
 				yPressedAnimation.stop();
 			}
 		});
+	}
+
+	public void cancelSnap(){
+		if (countingThread != null){
+			countingThread.interrupt();
+		}
+		deActivateAllKeys();
+		MainFm.stage.show();
+		MainFm.stage.requestFocus();
+		close();
 	}
 
 	/**
