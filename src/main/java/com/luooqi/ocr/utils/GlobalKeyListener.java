@@ -18,6 +18,9 @@ public class GlobalKeyListener implements NativeKeyListener {
         else if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE){
             MainFm.cancelSnap();
         }
+        else if (e.getKeyCode() == NativeKeyEvent.VC_F6){
+            MainFm.cancelSnap();
+        }
     }
 
     @Override

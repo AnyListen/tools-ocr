@@ -2,12 +2,14 @@
 package com.luooqi.ocr.controller;
 
 import cn.hutool.core.swing.ScreenUtil;
+import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.MainFm;
 import com.luooqi.ocr.model.CaptureWindowModel;
+import com.luooqi.ocr.utils.CommUtils;
+import com.luooqi.ocr.utils.OcrUtils;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -17,18 +19,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,34 +36,15 @@ import java.util.logging.Logger;
  *
  * @author GOXR3PLUS
  */
-public class CaptureWindowController extends Stage {
+public class ScreenCapture{
 
-	/**
-	 * The stack pane.
-	 */
-	@FXML
 	private BorderPane stackPane;
-
-	/**
-	 * The main canvas.
-	 */
-	@FXML
 	private Canvas mainCanvas;
-
-	@FXML
 	private ImageView mainImage;
-
-	// -----------------------------
-
-	/**
-	 * The Model of the CaptureWindow
-	 */
 	private CaptureWindowModel data = new CaptureWindowModel();
-
-	/**
-	 * The graphics context of the canvas
-	 */
 	private GraphicsContext gc;
+	private Scene scene;
+	private Stage stage;
 
 	/**
 	 * When a key is being pressed into the capture window then this Animation Timer is doing it's magic.
@@ -184,15 +164,20 @@ public class CaptureWindowController extends Stage {
 				try {
 					image = new Robot().createScreenCapture(new Rectangle(rect[0], rect[1], rect[2], rect[3]));
 				} catch (AWTException ex) {
-					Logger.getLogger(getClass().getName()).log(Level.INFO, null, ex);
+					StaticLog.error(ex);
 					return;
 				} finally {
 					mainCanvas.setDisable(false);
 				}
-				MainFm.stage.show();
-				close();
 				Platform.runLater(() -> {
-					//MainFm.doOCR(image);
+					MainFm.restore();
+					new Thread(()->{
+						byte[] bytes = CommUtils.imageToBytes(image);
+						String text = OcrUtils.sogouWebOcr(bytes);
+						Platform.runLater(()->{
+							MainFm.textArea.setText(text);
+						});
+					}).run();
 				});
 			}
 		}
@@ -206,35 +191,24 @@ public class CaptureWindowController extends Stage {
 	/**
 	 * Constructor.
 	 */
-	public CaptureWindowController() {
-		setX(0);
-		setY(0);
-        setTitle("树洞OCR文字识别");
-        getIcons().add(new Image(MainFm.class.getResource("/img/logo.png").toExternalForm()));
-		initStyle(StageStyle.TRANSPARENT);
-		setFullScreenExitHint("");
-		setFullScreen(true);
-		setAlwaysOnTop(true);
-	}
+	public ScreenCapture(Stage mainStage) {
+		stage = mainStage;
+		stackPane = new BorderPane();
+		stackPane.setStyle(CommUtils.STYLE_TRANSPARENT);
+		mainCanvas = new Canvas();
+		mainCanvas.setCursor(Cursor.CROSSHAIR);
+		mainCanvas.setStyle(CommUtils.STYLE_TRANSPARENT);
+		mainImage = new ImageView();
+		mainImage.setStyle(CommUtils.STYLE_TRANSPARENT);
 
-	private Scene scene;
-	private Stage nStage;
-
-	/**
-	 * Will be called as soon as FXML file is loaded.
-	 */
-	@FXML
-	public void initialize() {
-
-		setOpacity(0);
+		stackPane.getChildren().add(mainImage);
+		stackPane.getChildren().add(mainCanvas);
 
 		// Scene
 		scene = new Scene(stackPane, data.screenWidth, data.screenHeight, Color.TRANSPARENT);
 		scene.setCursor(Cursor.NONE);
-		setScene(scene);
-		addKeyHandlers();
 
-		mainImage.setSmooth(false);
+		addKeyHandlers();
 
 		// Canvas
 		mainCanvas.setWidth(data.screenWidth);
@@ -293,7 +267,7 @@ public class CaptureWindowController extends Stage {
 		// 4->when the user is pressing DOWN ARROW -> The rectangle is
 		// decreasing from the DOWN side
 
-		getScene().setOnKeyPressed(key -> {
+		scene.setOnKeyPressed(key -> {
 			if (key.isShiftDown())
 				data.shiftPressed.set(true);
 
@@ -315,14 +289,14 @@ public class CaptureWindowController extends Stage {
 		});
 
 		// keyReleased
-		getScene().setOnKeyReleased(key -> {
+		scene.setOnKeyReleased(key -> {
 			if (key.getCode() == KeyCode.SHIFT) {
 				data.shiftPressed.set(false);
 			}
 
 			if (key.getCode() == KeyCode.RIGHT) {
 				if (key.isControlDown()) {
-					data.mouseXNow = (int) getWidth();
+					data.mouseXNow = (int) stage.getWidth();
 					repaintCanvas();
 				}
 				data.rightPressed.set(false);
@@ -346,7 +320,7 @@ public class CaptureWindowController extends Stage {
 
 			if (key.getCode() == KeyCode.DOWN) {
 				if (key.isControlDown()) {
-					data.mouseYNow = (int) getHeight();
+					data.mouseYNow = (int) stage.getHeight();
 					repaintCanvas();
 				}
 				data.downPressed.set(false);
@@ -382,12 +356,8 @@ public class CaptureWindowController extends Stage {
 		if (countingThread != null){
 			countingThread.interrupt();
 		}
-		if (nStage == null){
-			return;
-		}
 		deActivateAllKeys();
-		MainFm.stage.show();
-		MainFm.stage.requestFocus();
+		MainFm.restore();
 	}
 
 	/**
@@ -414,7 +384,7 @@ public class CaptureWindowController extends Stage {
 			mainCanvas.setDisable(true);
 			if (!Thread.interrupted()) {
 				Platform.runLater(() -> {
-					gc.clearRect(0, 0, getWidth(), getHeight());
+					gc.clearRect(0, 0, stage.getWidth(), stage.getHeight());
 					waitFrameRender.start();
 				});
 			}
@@ -429,8 +399,8 @@ public class CaptureWindowController extends Stage {
 	private void repaintCanvas() {
 		gc.clearRect(0, 0, ScreenUtil.getWidth(), ScreenUtil.getHeight());
 		//gc.drawImage(fxImage, 0, 0);
-		//gc.setFill(Color.rgb(0, 0, 0, 0.2));
-		gc.setFill(Color.TRANSPARENT);
+		gc.setFill(Color.rgb(0, 0, 0, 0.6));
+		//gc.setFill(Color.TRANSPARENT);
 		gc.fillRect(0, 0, ScreenUtil.getWidth(), ScreenUtil.getHeight());
 
 		gc.setFont(data.font);
@@ -479,8 +449,8 @@ public class CaptureWindowController extends Stage {
 	private void selectWholeScreen() {
 		data.mouseXPressed = 0;
 		data.mouseYPressed = 0;
-		data.mouseXNow = (int) getWidth();
-		data.mouseYNow = (int) getHeight();
+		data.mouseXNow = (int) stage.getWidth();
+		data.mouseYNow = (int) stage.getHeight();
 		repaintCanvas();
 	}
 
@@ -490,19 +460,18 @@ public class CaptureWindowController extends Stage {
 	public void prepareForCapture() {
 		MainFm.stage.close();
 		Platform.runLater(()->{
-            BufferedImage bufferedImage = ScreenUtil.captureScreen();
-            WritableImage fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
+			BufferedImage bufferedImage = ScreenUtil.captureScreen();
+			WritableImage fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
             mainImage.setImage(fxImage);
-            data = new CaptureWindowModel();
+			repaintCanvas();
+			data = new CaptureWindowModel();
+			stage.setFullScreenExitHint("");
+			stage.setFullScreen(true);
+			stage.setAlwaysOnTop(true);
+			stage.setScene(scene);
+			stage.show();
+		});
 
-            nStage = new Stage();
-            nStage.setScene(scene);
-            nStage.setFullScreen(true);
-            nStage.setFullScreenExitHint("");
-            nStage.show();
-            //nStage.setAlwaysOnTop(true);
-            repaintCanvas();
-        });
 	}
 
 	/**

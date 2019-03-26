@@ -3,6 +3,8 @@ package com.luooqi.ocr;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.controller.CaptureWindowController;
+import com.luooqi.ocr.controller.ScreenCapture;
+import com.luooqi.ocr.model.StageInfo;
 import com.luooqi.ocr.utils.CommUtils;
 import com.luooqi.ocr.utils.GlobalKeyListener;
 import com.luooqi.ocr.utils.OcrUtils;
@@ -42,23 +44,20 @@ public class MainFm extends Application {
         launch(args);
     }
 
+    private static StageInfo stageInfo;
     public static Stage stage;
+    public static Scene mainScene;
+    public static ScreenCapture screenCapture;
     public static TextArea textArea;
     private static CaptureWindowController captureWindowController;
     public static BooleanProperty isOcr = new SimpleBooleanProperty(false);
 
     @Override
     public void start(Stage primaryStage) {
+        stage = primaryStage;
+        screenCapture = new ScreenCapture(stage);
         initKeyHook();
-        try {
-            stage = primaryStage;
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CaptureWindow.fxml"));
-            loader.load();
-            captureWindowController = loader.getController();
-        }
-        catch (Exception e) {
-            exit();
-        }
+        initSnapStage();
 
         HBox topBar = new HBox(
                 CommUtils.createButton("snapBtn", 28, MainFm::doSnap, "截图"),
@@ -73,7 +72,6 @@ public class MainFm extends Application {
 
         textArea = new TextArea();
         textArea.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
-
 
         ToolBar footerBar = new ToolBar();
         footerBar.setId("statsToolbar");
@@ -92,9 +90,20 @@ public class MainFm extends Application {
         );
 
         initStage(primaryStage);
-        Scene mainScene = new Scene(root, 420, 475);
+        mainScene = new Scene(root, 420, 475);
         stage.setScene(mainScene);
         stage.show();
+    }
+
+    private static void initSnapStage() {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainFm.class.getResource("/fxml/CaptureWindow.fxml"));
+            loader.load();
+            captureWindowController = loader.getController();
+        }
+        catch (Exception e) {
+            exit();
+        }
     }
 
     private void wrapText() {
@@ -157,11 +166,27 @@ public class MainFm extends Application {
     }
 
     public static void doSnap() {
-        runLater(captureWindowController::prepareForCapture);
+        //runLater(captureWindowController::prepareForCapture);
+        stageInfo = new StageInfo(stage.getX(), stage.getY(),
+                stage.getWidth(), stage.getHeight(), stage.isFullScreen());
+        runLater(screenCapture::prepareForCapture);
     }
 
     public static void cancelSnap() {
-        runLater(captureWindowController::cancelSnap);
+        //runLater(captureWindowController::cancelSnap);
+        runLater(screenCapture::cancelSnap);
+    }
+
+    public static void restore() {
+        stage.close();
+        stage.setScene(mainScene);
+        stage.setX(stageInfo.getX());
+        stage.setY(stageInfo.getY());
+        stage.setWidth(stageInfo.getWidth());
+        stage.setHeight(stageInfo.getHeight());
+        stage.setFullScreen(stageInfo.isFullScreenState());
+        stage.show();
+        stage.requestFocus();
     }
 
     public static void doOCR(BufferedImage image) {

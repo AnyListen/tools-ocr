@@ -41,24 +41,43 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.5.1</version>
                 <configuration>
-                    <release>8</release>
+                    <encoding>UTF-8</encoding>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
                 <executions>
                     <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
                         <goals>
-                            <goal>java</goal>
+                            <goal>copy-dependencies</goal>
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.zenjava</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>8.8.3</version>
                 <configuration>
-                    <mainClass>HelloFX</mainClass>
+                    <mainClass>com.luooqi.ocr.MainFm</mainClass>
+                    <bundler>dmg</bundler>
+                    <jfxAppOutputDir>${project.build.directory}/app</jfxAppOutputDir>
+                    <nativeOutputDir>${project.build.directory}/native</nativeOutputDir>
+                    <appName>树洞OCR文字识别</appName>
+                    <vendor>com.luooqi.ocr</vendor>
                 </configuration>
             </plugin>
         </plugins>

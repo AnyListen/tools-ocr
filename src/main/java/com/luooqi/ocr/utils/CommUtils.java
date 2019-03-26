@@ -28,6 +28,7 @@ public class CommUtils {
     private static final float IMAGE_QUALITY = 0.5f;
     private static final int SAME_LINE_LIMIT = 8;
     private static final int CHAR_WIDTH = 12;
+    public static final String STYLE_TRANSPARENT = "-fx-background-color: transparent;";
 
     public static byte[] imageToBytes(BufferedImage img) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -40,7 +41,6 @@ public class CommUtils {
             byte[] result = outputStream.toByteArray();
             System.out.println(result.length);
             outputStream.close();
-            FileUtil.writeBytes(result, "demo.jpeg");
             return result;
         } catch (IOException e) {
             StaticLog.error(e);
@@ -83,7 +83,13 @@ public class CommUtils {
             for (int i = 0, ln = (line.get(0).getTopLeft().x - baseX) / CHAR_WIDTH; i < ln; i++) {
                 sb.append("  ");
             }
-            line.forEach(text -> sb.append(text.getText()));
+            line.forEach(text -> {
+                String ocrText = text.getText();
+                sb.append(ocrText);
+                if (ocrText.matches("^\\w+$")){
+                    sb.append(" ");
+                }
+            });
             sb.append("\n");
         });
         return sb.toString();

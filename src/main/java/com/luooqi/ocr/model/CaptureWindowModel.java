@@ -1,12 +1,12 @@
 
 package com.luooqi.ocr.model;
 
+import cn.hutool.core.swing.ScreenUtil;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Screen;
 
 /**
  * @author GOXR3PLUS
@@ -42,7 +42,7 @@ public class CaptureWindowModel {
 	
 	/** The font. */
 	public Font font = Font.font("", FontWeight.BOLD, 14);
-	
+
 	// ---------------
 	
 	/** The shift pressed. */
@@ -69,9 +69,9 @@ public class CaptureWindowModel {
 	// ------------
 	
 	/** The screen width. */
-	public int screenWidth = (int) Screen.getPrimary().getBounds().getWidth();
+	public int screenWidth = ScreenUtil.getWidth();
 	
 	/** The screen height. */
-	public int screenHeight = (int) Screen.getPrimary().getBounds().getHeight();
+	public int screenHeight = ScreenUtil.getHeight();
 	
 }

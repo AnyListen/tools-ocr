@@ -2,20 +2,22 @@
 
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.layout.StackPane?>
 
-<StackPane fx:id="stackPane" prefHeight="406.0" prefWidth="514.0" style="-fx-background-color: rgb(0,0,0,0.01);" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.luooqi.ocr.controller.CaptureWindowController">
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.image.ImageView?>
+<BorderPane fx:id="stackPane" prefHeight="406.0" prefWidth="514.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.luooqi.ocr.controller.CaptureWindowController">
    <children>
-      <StackPane prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: transparent;">
+      <ImageView fx:id="mainImage"></ImageView>
+      <BorderPane prefHeight="150.0" prefWidth="200.0" style="-fx-background-color: transparent;">
          <children>
-            <Canvas fx:id="mainCanvas" height="200.0" width="200.0" />
+            <Canvas fx:id="mainCanvas" height="200.0" width="200.0" style="-fx-background-color: transparent;"/>
          </children>
          <cursor>
             <Cursor fx:constant="DEFAULT" />
          </cursor>
-      </StackPane>
+      </BorderPane>
    </children>
    <cursor>
       <Cursor fx:constant="DEFAULT" />
    </cursor>
-</StackPane>
+</BorderPane>
