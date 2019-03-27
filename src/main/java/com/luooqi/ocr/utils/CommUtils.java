@@ -6,21 +6,20 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.model.TextBlock;
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGEncodeParam;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.*;
 
 public class CommUtils {
 
@@ -31,15 +30,20 @@ public class CommUtils {
     public static final String SPECIAL_CHARS = "[\\s`~!@#$%^&*()_\\-+=|{}':;,\\[\\].<>/?！￥…（）【】‘；：”“’。，、？]+";
 
     public static byte[] imageToBytes(BufferedImage img) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        MemoryCacheImageOutputStream outputStream = new MemoryCacheImageOutputStream(byteArrayOutputStream);
         try {
-            ImageIO.write(img, "jpeg", outputStream);
-            JPEGImageEncoder encoder = JPEGCodec.createJPEGEncoder(outputStream);
-            JPEGEncodeParam jep = JPEGCodec.getDefaultJPEGEncodeParam(img);
-            jep.setQuality(IMAGE_QUALITY, true);
-            encoder.encode(img, jep);
-            byte[] result = outputStream.toByteArray();
-            System.out.println(result.length);
+            Iterator iter = ImageIO.getImageWritersByFormatName("jpeg");
+            ImageWriter writer = (ImageWriter)iter.next();
+            ImageWriteParam iwp = writer.getDefaultWriteParam();
+            iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            iwp.setCompressionQuality(IMAGE_QUALITY);
+            writer.setOutput(outputStream);
+            IIOImage image = new IIOImage(img, null, null);
+            writer.write(null, image, iwp);
+            writer.dispose();
+            byte[] result = byteArrayOutputStream.toByteArray();
+            byteArrayOutputStream.close();
             outputStream.close();
             return result;
         } catch (IOException e) {

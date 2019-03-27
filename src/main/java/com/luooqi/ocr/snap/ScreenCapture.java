@@ -3,7 +3,6 @@ package com.luooqi.ocr.snap;
 
 import cn.hutool.core.swing.ScreenUtil;
 import cn.hutool.log.StaticLog;
-import com.apple.eawt.FullScreenUtilities;
 import com.luooqi.ocr.MainFm;
 import com.luooqi.ocr.model.CaptureInfo;
 import com.luooqi.ocr.utils.CommUtils;
