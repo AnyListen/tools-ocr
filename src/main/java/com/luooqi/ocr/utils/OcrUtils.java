@@ -46,7 +46,7 @@ public class OcrUtils {
         request.form(data);
         request.header("Referer", referer);
         HttpResponse response = request.execute();
-        return extractSogouResult(WebHelper.getSafeHtml(response));
+        return extractSogouResult(WebUtils.getSafeHtml(response));
     }
 
     private static String extractSogouResult(String html) {

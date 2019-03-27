@@ -1,10 +1,10 @@
 
-package com.luooqi.ocr.controller;
+package com.luooqi.ocr.snap;
 
 import cn.hutool.core.swing.ScreenUtil;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.MainFm;
-import com.luooqi.ocr.model.CaptureWindowModel;
+import com.luooqi.ocr.model.CaptureInfo;
 import com.luooqi.ocr.utils.CommUtils;
 import com.luooqi.ocr.utils.OcrUtils;
 import javafx.animation.AnimationTimer;
@@ -14,22 +14,17 @@ import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This is the Window which is used from the user to draw the rectangle representing an area on the screen to be captured.
@@ -38,10 +33,10 @@ import java.util.logging.Logger;
  */
 public class ScreenCapture{
 
-	private BorderPane stackPane;
+	private BorderPane rootPane;
 	private Canvas mainCanvas;
-	private ImageView mainImage;
-	private CaptureWindowModel data = new CaptureWindowModel();
+	//private ImageView mainImage;
+	private CaptureInfo data;
 	private GraphicsContext gc;
 	private Scene scene;
 	private Stage stage;
@@ -143,69 +138,23 @@ public class ScreenCapture{
 	};
 
 	/**
-	 * This AnimationTimer waits until the canvas is cleared before it can capture the screen.
-	 */
-	private AnimationTimer waitFrameRender = new AnimationTimer() {
-		private int frameCount = 0;
-
-		@Override
-		public void start() {
-			frameCount = 0;
-			super.start();
-		}
-
-		@Override
-		public void handle(long timestamp) {
-			frameCount++;
-			if (frameCount >= 5) {
-				stop();
-				BufferedImage image;
-				int[] rect = getRectangleBounds();
-				try {
-					image = new Robot().createScreenCapture(new Rectangle(rect[0], rect[1], rect[2], rect[3]));
-				} catch (AWTException ex) {
-					StaticLog.error(ex);
-					return;
-				} finally {
-					mainCanvas.setDisable(false);
-				}
-				Platform.runLater(() -> {
-					MainFm.restore();
-					new Thread(()->{
-						byte[] bytes = CommUtils.imageToBytes(image);
-						String text = OcrUtils.sogouWebOcr(bytes);
-						Platform.runLater(()->{
-							MainFm.textArea.setText(text);
-						});
-					}).run();
-				});
-			}
-		}
-	};
-
-	/**
-	 * The counting thread.
-	 */
-	private Thread countingThread;
-
-	/**
 	 * Constructor.
 	 */
 	public ScreenCapture(Stage mainStage) {
 		stage = mainStage;
-		stackPane = new BorderPane();
-		stackPane.setStyle(CommUtils.STYLE_TRANSPARENT);
+		rootPane = new BorderPane();
+		//rootPane.setStyle(CommUtils.STYLE_TRANSPARENT);
 		mainCanvas = new Canvas();
 		mainCanvas.setCursor(Cursor.CROSSHAIR);
 		mainCanvas.setStyle(CommUtils.STYLE_TRANSPARENT);
-		mainImage = new ImageView();
-		mainImage.setStyle(CommUtils.STYLE_TRANSPARENT);
-
-		stackPane.getChildren().add(mainImage);
-		stackPane.getChildren().add(mainCanvas);
+		//mainImage = new ImageView();
+		//mainImage.setStyle(CommUtils.STYLE_TRANSPARENT);
+		//rootPane.getChildren().add(mainImage);
+		rootPane.getChildren().add(mainCanvas);
 
 		// Scene
-		scene = new Scene(stackPane, data.screenWidth, data.screenHeight, Color.TRANSPARENT);
+		data = new CaptureInfo();
+		scene = new Scene(rootPane, data.screenWidth, data.screenHeight, Color.TRANSPARENT);
 		scene.setCursor(Cursor.NONE);
 
 		addKeyHandlers();
@@ -352,14 +301,6 @@ public class ScreenCapture{
 		});
 	}
 
-	public void cancelSnap(){
-		if (countingThread != null){
-			countingThread.interrupt();
-		}
-		deActivateAllKeys();
-		MainFm.restore();
-	}
-
 	/**
 	 * Deactivates the keys contained into this method.
 	 */
@@ -373,33 +314,12 @@ public class ScreenCapture{
 	}
 
 	/**
-	 * Creates and saves the image.
-	 */
-	private void prepareImage() {
-		//if ((countingThread != null && countingThread.isAlive()) || captureService.isRunning()) {
-		if ((countingThread != null && countingThread.isAlive())) {
-			return;
-		}
-		countingThread = new Thread(() -> {
-			mainCanvas.setDisable(true);
-			if (!Thread.interrupted()) {
-				Platform.runLater(() -> {
-					gc.clearRect(0, 0, stage.getWidth(), stage.getHeight());
-					waitFrameRender.start();
-				});
-			}
-		});
-		countingThread.setDaemon(true);
-		countingThread.start();
-	}
-
-	/**
 	 * Repaint the canvas of the capture window.
 	 */
 	private void repaintCanvas() {
 		gc.clearRect(0, 0, ScreenUtil.getWidth(), ScreenUtil.getHeight());
 		//gc.drawImage(fxImage, 0, 0);
-		gc.setFill(Color.rgb(0, 0, 0, 0.6));
+		gc.setFill(Color.rgb(0, 0, 0, 0.4));
 		//gc.setFill(Color.TRANSPARENT);
 		gc.fillRect(0, 0, ScreenUtil.getWidth(), ScreenUtil.getHeight());
 
@@ -454,17 +374,24 @@ public class ScreenCapture{
 		repaintCanvas();
 	}
 
-	/**
-	 * Prepares the Window for the User.
-	 */
 	public void prepareForCapture() {
 		MainFm.stage.close();
 		Platform.runLater(()->{
+			try {
+				Thread.sleep(250);
+			}
+			catch (InterruptedException e) {
+				StaticLog.error(e);
+			}
 			BufferedImage bufferedImage = ScreenUtil.captureScreen();
 			WritableImage fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
-            mainImage.setImage(fxImage);
+			data = new CaptureInfo();
+			//mainImage.setImage(fxImage);
+			rootPane.setBackground(new Background(new BackgroundImage(fxImage,
+					BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
+					BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+
 			repaintCanvas();
-			data = new CaptureWindowModel();
 			stage.setFullScreenExitHint("");
 			stage.setFullScreen(true);
 			stage.setAlwaysOnTop(true);
@@ -474,11 +401,32 @@ public class ScreenCapture{
 
 	}
 
-	/**
-	 * Return an array witch contains the (UPPER_LEFT) Point2D of the rectangle and the width and height of the rectangle.
-	 *
-	 * @return An array witch contains the (UPPER_LEFT) Point2D of the rectangle and the width and height of the rectangle
-	 */
+    private void prepareImage() {
+        gc.clearRect(0, 0, stage.getWidth(), stage.getHeight());
+        BufferedImage image;
+        int[] rect = getRectangleBounds();
+        try {
+            mainCanvas.setDisable(true);
+            image = new Robot().createScreenCapture(new Rectangle(rect[0], rect[1], rect[2], rect[3]));
+        } catch (AWTException ex) {
+            StaticLog.error(ex);
+            return;
+        } finally {
+            mainCanvas.setDisable(false);
+            MainFm.restore();
+        }
+        new Thread(()->{
+            byte[] bytes = CommUtils.imageToBytes(image);
+            String text = OcrUtils.sogouWebOcr(bytes);
+            Platform.runLater(()-> MainFm.textArea.setText(text));
+        }).run();
+    }
+
+    public void cancelSnap(){
+        deActivateAllKeys();
+        MainFm.restore();
+    }
+
 	private int[] getRectangleBounds() {
 		return new int[]{data.rectUpperLeftX, data.rectUpperLeftY, data.rectWidth, data.rectHeight};
 	}

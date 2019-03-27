@@ -1,6 +1,5 @@
 package com.luooqi.ocr.utils;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -116,7 +115,7 @@ public class CommUtils {
                 request.cookie(cookie);
             }
             HttpResponse response = request.execute();
-            return WebHelper.getSafeHtml(response);
+            return WebUtils.getSafeHtml(response);
         } catch (Exception ex) {
             StaticLog.error(ex);
             return null;

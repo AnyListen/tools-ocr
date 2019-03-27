@@ -12,7 +12,7 @@ import javafx.scene.text.FontWeight;
  * @author GOXR3PLUS
  *
  */
-public class CaptureWindowModel {
+public class CaptureInfo {
 	
 	/** The x pressed. */
 	public int mouseXPressed = 0;

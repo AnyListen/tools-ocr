@@ -14,7 +14,7 @@ import java.util.Map;
  * Created by 何志龙 on 2018-03-25.
  */
 @SuppressWarnings("SpellCheckingInspection")
-public class WebHelper {
+public class WebUtils {
 
     static {
         HttpRequest.closeCookie();

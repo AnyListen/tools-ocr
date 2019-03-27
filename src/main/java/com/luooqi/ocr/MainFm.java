@@ -2,8 +2,7 @@ package com.luooqi.ocr;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
-import com.luooqi.ocr.controller.CaptureWindowController;
-import com.luooqi.ocr.controller.ScreenCapture;
+import com.luooqi.ocr.snap.ScreenCapture;
 import com.luooqi.ocr.model.StageInfo;
 import com.luooqi.ocr.utils.CommUtils;
 import com.luooqi.ocr.utils.GlobalKeyListener;
@@ -178,14 +177,13 @@ public class MainFm extends Application {
     }
 
     public static void restore() {
-        stage.close();
         stage.setScene(mainScene);
+        stage.setFullScreen(stageInfo.isFullScreenState());
+        stage.setAlwaysOnTop(false);
         stage.setX(stageInfo.getX());
         stage.setY(stageInfo.getY());
         stage.setWidth(stageInfo.getWidth());
         stage.setHeight(stageInfo.getHeight());
-        stage.setFullScreen(stageInfo.isFullScreenState());
-        stage.show();
         stage.requestFocus();
     }
 
