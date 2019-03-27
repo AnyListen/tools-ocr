@@ -28,6 +28,7 @@ public class CommUtils {
     private static final int SAME_LINE_LIMIT = 8;
     private static final int CHAR_WIDTH = 12;
     public static final String STYLE_TRANSPARENT = "-fx-background-color: transparent;";
+    public static final String SPECIAL_CHARS = "[\\s`~!@#$%^&*()_\\-+=|{}':;,\\[\\].<>/?！￥…（）【】‘；：”“’。，、？]+";
 
     public static byte[] imageToBytes(BufferedImage img) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

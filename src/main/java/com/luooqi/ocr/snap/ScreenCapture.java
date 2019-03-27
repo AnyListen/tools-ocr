@@ -3,6 +3,7 @@ package com.luooqi.ocr.snap;
 
 import cn.hutool.core.swing.ScreenUtil;
 import cn.hutool.log.StaticLog;
+import com.apple.eawt.FullScreenUtilities;
 import com.luooqi.ocr.MainFm;
 import com.luooqi.ocr.model.CaptureInfo;
 import com.luooqi.ocr.utils.CommUtils;
@@ -22,9 +23,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import org.imgscalr.Scalr;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 
 /**
  * This is the Window which is used from the user to draw the rectangle representing an area on the screen to be captured.
@@ -141,6 +144,7 @@ public class ScreenCapture{
 	 * Constructor.
 	 */
 	public ScreenCapture(Stage mainStage) {
+		data = new CaptureInfo();
 		stage = mainStage;
 		rootPane = new BorderPane();
 		//rootPane.setStyle(CommUtils.STYLE_TRANSPARENT);
@@ -153,7 +157,6 @@ public class ScreenCapture{
 		rootPane.getChildren().add(mainCanvas);
 
 		// Scene
-		data = new CaptureInfo();
 		scene = new Scene(rootPane, data.screenWidth, data.screenHeight, Color.TRANSPARENT);
 		scene.setCursor(Cursor.NONE);
 
@@ -234,7 +237,6 @@ public class ScreenCapture{
 
 			if (key.getCode() == KeyCode.H)
 				data.hideExtraFeatures.set(true);
-
 		});
 
 		// keyReleased
@@ -317,11 +319,11 @@ public class ScreenCapture{
 	 * Repaint the canvas of the capture window.
 	 */
 	private void repaintCanvas() {
-		gc.clearRect(0, 0, ScreenUtil.getWidth(), ScreenUtil.getHeight());
+		gc.clearRect(0, 0, data.screenWidth, data.screenHeight);
 		//gc.drawImage(fxImage, 0, 0);
 		gc.setFill(Color.rgb(0, 0, 0, 0.4));
 		//gc.setFill(Color.TRANSPARENT);
-		gc.fillRect(0, 0, ScreenUtil.getWidth(), ScreenUtil.getHeight());
+		gc.fillRect(0, 0, data.screenWidth, data.screenHeight);
 
 		gc.setFont(data.font);
 		// draw the actual rectangle
@@ -384,12 +386,12 @@ public class ScreenCapture{
 				StaticLog.error(e);
 			}
 			BufferedImage bufferedImage = ScreenUtil.captureScreen();
+			bufferedImage = Scalr.resize(bufferedImage, Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, data.screenWidth * 2, data.screenHeight * 2);
 			WritableImage fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
-			data = new CaptureInfo();
-			//mainImage.setImage(fxImage);
+			data.reset();
 			rootPane.setBackground(new Background(new BackgroundImage(fxImage,
 					BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
-					BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+					BackgroundPosition.CENTER, new BackgroundSize(data.screenWidth, data.screenHeight, false, false, true, true))));
 
 			repaintCanvas();
 			stage.setFullScreenExitHint("");
@@ -415,11 +417,13 @@ public class ScreenCapture{
             mainCanvas.setDisable(false);
             MainFm.restore();
         }
-        new Thread(()->{
-            byte[] bytes = CommUtils.imageToBytes(image);
-            String text = OcrUtils.sogouWebOcr(bytes);
-            Platform.runLater(()-> MainFm.textArea.setText(text));
-        }).run();
+        Thread ocrThread = new Thread(()->{
+			byte[] bytes = CommUtils.imageToBytes(image);
+			String text = OcrUtils.sogouWebOcr(bytes);
+			Platform.runLater(()-> MainFm.textArea.setText(text));
+		});
+        ocrThread.setDaemon(false);
+        ocrThread.start();
     }
 
     public void cancelSnap(){

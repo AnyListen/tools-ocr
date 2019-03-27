@@ -2,19 +2,17 @@ package com.luooqi.ocr;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
-import com.luooqi.ocr.snap.ScreenCapture;
 import com.luooqi.ocr.model.StageInfo;
+import com.luooqi.ocr.snap.ScreenCapture;
 import com.luooqi.ocr.utils.CommUtils;
 import com.luooqi.ocr.utils.GlobalKeyListener;
-import com.luooqi.ocr.utils.OcrUtils;
 import javafx.application.Application;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
@@ -26,7 +24,6 @@ import javafx.stage.Stage;
 import org.jnativehook.GlobalScreen;
 
 import javax.swing.*;
-import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
@@ -34,7 +31,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static javafx.application.Platform.exit;
 import static javafx.application.Platform.runLater;
 
 public class MainFm extends Application {
@@ -45,18 +41,17 @@ public class MainFm extends Application {
 
     private static StageInfo stageInfo;
     public static Stage stage;
-    public static Scene mainScene;
-    public static ScreenCapture screenCapture;
+    private static Scene mainScene;
+    private static ScreenCapture screenCapture;
     public static TextArea textArea;
-    private static CaptureWindowController captureWindowController;
-    public static BooleanProperty isOcr = new SimpleBooleanProperty(false);
+    //private static BooleanProperty isOcr = new SimpleBooleanProperty(false);
 
     @Override
     public void start(Stage primaryStage) {
         stage = primaryStage;
         screenCapture = new ScreenCapture(stage);
         initKeyHook();
-        initSnapStage();
+        //initSnapStage();
 
         HBox topBar = new HBox(
                 CommUtils.createButton("snapBtn", 28, MainFm::doSnap, "截图"),
@@ -76,7 +71,7 @@ public class MainFm extends Application {
         footerBar.setId("statsToolbar");
         Label statsLabel = new Label();
         SimpleStringProperty statsProperty = new SimpleStringProperty("总字数：0");
-        textArea.textProperty().addListener((observable, oldValue, newValue) -> statsProperty.set("总字数：" + newValue.replaceAll("\\s+", "").length()));
+        textArea.textProperty().addListener((observable, oldValue, newValue) -> statsProperty.set("总字数：" + newValue.replaceAll(CommUtils.SPECIAL_CHARS, "").length()));
         statsLabel.textProperty().bind(statsProperty);
         footerBar.getItems().add(statsLabel);
 
@@ -94,16 +89,16 @@ public class MainFm extends Application {
         stage.show();
     }
 
-    private static void initSnapStage() {
-        try {
-            FXMLLoader loader = new FXMLLoader(MainFm.class.getResource("/fxml/CaptureWindow.fxml"));
-            loader.load();
-            captureWindowController = loader.getController();
-        }
-        catch (Exception e) {
-            exit();
-        }
-    }
+//    private static void initSnapStage() {
+//        try {
+//            FXMLLoader loader = new FXMLLoader(MainFm.class.getResource("/fxml/CaptureWindow.fxml"));
+//            loader.load();
+//            captureWindowController = loader.getController();
+//        }
+//        catch (Exception e) {
+//            exit();
+//        }
+//    }
 
     private void wrapText() {
         textArea.setWrapText(!textArea.isWrapText());
@@ -177,9 +172,9 @@ public class MainFm extends Application {
     }
 
     public static void restore() {
+        stage.setAlwaysOnTop(false);
         stage.setScene(mainScene);
         stage.setFullScreen(stageInfo.isFullScreenState());
-        stage.setAlwaysOnTop(false);
         stage.setX(stageInfo.getX());
         stage.setY(stageInfo.getY());
         stage.setWidth(stageInfo.getWidth());
@@ -187,12 +182,12 @@ public class MainFm extends Application {
         stage.requestFocus();
     }
 
-    public static void doOCR(BufferedImage image) {
-        isOcr.setValue(true);
-        byte[] bytes = CommUtils.imageToBytes(image);
-        isOcr.setValue(false);
-        textArea.setText(OcrUtils.sogouWebOcr(bytes));
-    }
+//    public static void doOCR(BufferedImage image) {
+//        isOcr.setValue(true);
+//        byte[] bytes = CommUtils.imageToBytes(image);
+//        isOcr.setValue(false);
+//        textArea.setText(OcrUtils.sogouWebOcr(bytes));
+//    }
 
     private static void initKeyHook(){
         try {
