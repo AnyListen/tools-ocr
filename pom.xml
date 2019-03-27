@@ -80,6 +80,9 @@
                     <verbose>true</verbose>
                     <vendor>com.luooqi</vendor>
                     <needShortcut>true</needShortcut>
+                    <bundleArguments>
+                        <runtime />
+                    </bundleArguments>
                 </configuration>
             </plugin>
         </plugins>

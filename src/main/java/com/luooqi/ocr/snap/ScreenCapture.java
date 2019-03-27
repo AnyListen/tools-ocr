@@ -42,6 +42,7 @@ public class ScreenCapture{
 	private GraphicsContext gc;
 	private Scene scene;
 	private Stage stage;
+	public static boolean isSnaping = false;
 
 	/**
 	 * When a key is being pressed into the capture window then this Animation Timer is doing it's magic.
@@ -286,9 +287,11 @@ public class ScreenCapture{
 
 			if (key.getCode() == KeyCode.ESCAPE || key.getCode() == KeyCode.BACK_SPACE) {
 				cancelSnap();
+				isSnaping = false;
 			} else if (key.getCode() == KeyCode.ENTER || key.getCode() == KeyCode.SPACE) {
 				deActivateAllKeys();
 				prepareImage();
+				isSnaping = false;
 			}
 		});
 
@@ -376,6 +379,7 @@ public class ScreenCapture{
 	}
 
 	public void prepareForCapture() {
+		isSnaping = true;
 		MainFm.stage.close();
 		Platform.runLater(()->{
 			try {

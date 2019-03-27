@@ -52,8 +52,8 @@ public class CommUtils {
         }
     }
 
-    public static String combineTextBlocks(List<TextBlock> textBlocks) {
-        Collections.sort(textBlocks, Comparator.comparingInt(o -> o.getTopLeft().y));
+    static String combineTextBlocks(List<TextBlock> textBlocks) {
+        textBlocks.sort(Comparator.comparingInt(o -> o.getTopLeft().y));
         List<List<TextBlock>> lineBlocks = new ArrayList<>();
         int lastY = -1;
         List<TextBlock> lineBlock = new ArrayList<>();
@@ -69,7 +69,7 @@ public class CommUtils {
                 sameLine = textBlock.getTopLeft().y - lastY <= SAME_LINE_LIMIT;
             }
             if (!sameLine) {
-                Collections.sort(lineBlock, Comparator.comparingInt(o -> o.getTopLeft().x));
+                lineBlock.sort(Comparator.comparingInt(o -> o.getTopLeft().x));
                 lineBlocks.add(lineBlock);
                 lineBlock = new ArrayList<>();
                 sameLine = true;
@@ -78,7 +78,7 @@ public class CommUtils {
             lineBlock.add(textBlock);
         }
         if (lineBlock.size() > 0) {
-            Collections.sort(lineBlock, Comparator.comparingInt(o -> o.getTopLeft().x));
+            lineBlock.sort(Comparator.comparingInt(o -> o.getTopLeft().x));
             lineBlocks.add(lineBlock);
         }
         StringBuilder sb = new StringBuilder();
@@ -99,16 +99,16 @@ public class CommUtils {
         return sb.toString();
     }
 
-    public static Point frameToPoint(String text) {
+    static Point frameToPoint(String text) {
         String[] arr = text.split(",");
         return new Point(Integer.valueOf(arr[0].trim()), Integer.valueOf(arr[1].trim()));
     }
 
-    public static String postMultiData(String url, byte[] data, String boundary) {
+    static String postMultiData(String url, byte[] data, String boundary) {
         return postMultiData(url, data, boundary, "", "");
     }
 
-    public static String postMultiData(String url, byte[] data, String boundary, String cookie, String referer) {
+    private static String postMultiData(String url, byte[] data, String boundary, String cookie, String referer) {
         try {
             HttpRequest request = HttpUtil.createPost(url).timeout(15000);
             request.contentType("multipart/form-data; boundary=" + boundary);
@@ -127,7 +127,7 @@ public class CommUtils {
         }
     }
 
-    public static byte[] mergeByte(byte[]... bytes) {
+    static byte[] mergeByte(byte[]... bytes) {
         int length = 0;
         for (byte[] b : bytes) {
             length += b.length;
