@@ -6,8 +6,14 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.model.TextBlock;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -23,6 +29,9 @@ import java.util.*;
 
 public class CommUtils {
 
+    public static final Paint MASK_COLOR = Color.rgb(0, 0, 0, 0.4);
+    public static Background BG_TRANSPARENT = new Background(new BackgroundFill(Color.TRANSPARENT,
+            CornerRadii.EMPTY, Insets.EMPTY));
     private static final float IMAGE_QUALITY = 0.5f;
     private static final int SAME_LINE_LIMIT = 8;
     private static final int CHAR_WIDTH = 12;

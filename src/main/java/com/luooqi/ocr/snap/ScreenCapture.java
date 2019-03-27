@@ -26,7 +26,6 @@ import org.imgscalr.Scalr;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 
 /**
  * This is the Window which is used from the user to draw the rectangle representing an area on the screen to be captured.
@@ -37,12 +36,11 @@ public class ScreenCapture{
 
 	private BorderPane rootPane;
 	private Canvas mainCanvas;
-	//private ImageView mainImage;
 	private CaptureInfo data;
 	private GraphicsContext gc;
 	private Scene scene;
 	private Stage stage;
-	public static boolean isSnaping = false;
+	public static boolean isSnapping = false;
 
 	/**
 	 * When a key is being pressed into the capture window then this Animation Timer is doing it's magic.
@@ -147,13 +145,9 @@ public class ScreenCapture{
 		data = new CaptureInfo();
 		stage = mainStage;
 		rootPane = new BorderPane();
-		//rootPane.setStyle(CommUtils.STYLE_TRANSPARENT);
 		mainCanvas = new Canvas();
 		mainCanvas.setCursor(Cursor.CROSSHAIR);
 		mainCanvas.setStyle(CommUtils.STYLE_TRANSPARENT);
-		//mainImage = new ImageView();
-		//mainImage.setStyle(CommUtils.STYLE_TRANSPARENT);
-		//rootPane.getChildren().add(mainImage);
 		rootPane.getChildren().add(mainCanvas);
 
 		// Scene
@@ -287,11 +281,11 @@ public class ScreenCapture{
 
 			if (key.getCode() == KeyCode.ESCAPE || key.getCode() == KeyCode.BACK_SPACE) {
 				cancelSnap();
-				isSnaping = false;
+				isSnapping = false;
 			} else if (key.getCode() == KeyCode.ENTER || key.getCode() == KeyCode.SPACE) {
 				deActivateAllKeys();
 				prepareImage();
-				isSnaping = false;
+				isSnapping = false;
 			}
 		});
 
@@ -322,15 +316,11 @@ public class ScreenCapture{
 	 */
 	private void repaintCanvas() {
 		gc.clearRect(0, 0, data.screenWidth, data.screenHeight);
-		//gc.drawImage(fxImage, 0, 0);
-		gc.setFill(Color.rgb(0, 0, 0, 0.4));
-		//gc.setFill(Color.TRANSPARENT);
+		gc.setFill(CommUtils.MASK_COLOR);
 		gc.fillRect(0, 0, data.screenWidth, data.screenHeight);
 
 		gc.setFont(data.font);
-		// draw the actual rectangle
 		gc.setStroke(Color.RED);
-		// gc.setFill(model.background)
 		gc.setLineWidth(1);
 
 		// smart calculation of where the mouse has been dragged
@@ -351,8 +341,6 @@ public class ScreenCapture{
 		;
 
 		gc.strokeRect(data.rectUpperLeftX - 1.00, data.rectUpperLeftY - 1.00, data.rectWidth + 2.00, data.rectHeight + 2.00);
-		//gc.setFill(Color.TRANSPARENT);
-		//gc.fillRect(data.rectUpperLeftX, data.rectUpperLeftY, data.rectWidth, data.rectHeight);
 		gc.clearRect(data.rectUpperLeftX, data.rectUpperLeftY, data.rectWidth, data.rectHeight);
 
 		// draw the text
@@ -379,11 +367,11 @@ public class ScreenCapture{
 	}
 
 	public void prepareForCapture() {
-		isSnaping = true;
+		isSnapping = true;
 		MainFm.stage.close();
 		Platform.runLater(()->{
 			try {
-				Thread.sleep(250);
+				Thread.sleep(150);
 			}
 			catch (InterruptedException e) {
 				StaticLog.error(e);
@@ -395,7 +383,6 @@ public class ScreenCapture{
 			rootPane.setBackground(new Background(new BackgroundImage(fxImage,
 					BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
 					BackgroundPosition.CENTER, new BackgroundSize(data.screenWidth, data.screenHeight, false, false, true, true))));
-
 			repaintCanvas();
 			stage.setFullScreenExitHint("");
 			stage.setFullScreen(true);

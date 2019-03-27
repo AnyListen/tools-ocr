@@ -22,7 +22,7 @@ public class GlobalKeyListener implements NativeKeyListener {
             MainFm.doSnap();
         }
         else if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE){
-            if (ScreenCapture.isSnaping){
+            if (ScreenCapture.isSnapping){
                 preventEvent(e);
                 MainFm.cancelSnap();
             }

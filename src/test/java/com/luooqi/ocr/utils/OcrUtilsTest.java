@@ -1,9 +1,11 @@
 package com.luooqi.ocr.utils;
 
+import cn.hutool.core.swing.ScreenUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.luooqi.ocr.model.TextBlock;
+import javafx.scene.SnapshotParameters;
 import org.junit.Test;
 
 import java.awt.*;

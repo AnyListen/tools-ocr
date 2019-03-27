@@ -51,7 +51,6 @@ public class MainFm extends Application {
         stage = primaryStage;
         screenCapture = new ScreenCapture(stage);
         initKeyHook();
-        //initSnapStage();
 
         HBox topBar = new HBox(
                 CommUtils.createButton("snapBtn", 28, MainFm::doSnap, "截图"),
@@ -88,17 +87,6 @@ public class MainFm extends Application {
         stage.setScene(mainScene);
         stage.show();
     }
-
-//    private static void initSnapStage() {
-//        try {
-//            FXMLLoader loader = new FXMLLoader(MainFm.class.getResource("/fxml/CaptureWindow.fxml"));
-//            loader.load();
-//            captureWindowController = loader.getController();
-//        }
-//        catch (Exception e) {
-//            exit();
-//        }
-//    }
 
     private void wrapText() {
         textArea.setWrapText(!textArea.isWrapText());
@@ -160,14 +148,12 @@ public class MainFm extends Application {
     }
 
     public static void doSnap() {
-        //runLater(captureWindowController::prepareForCapture);
         stageInfo = new StageInfo(stage.getX(), stage.getY(),
                 stage.getWidth(), stage.getHeight(), stage.isFullScreen());
         runLater(screenCapture::prepareForCapture);
     }
 
     public static void cancelSnap() {
-        //runLater(captureWindowController::cancelSnap);
         runLater(screenCapture::cancelSnap);
     }
 
@@ -181,13 +167,6 @@ public class MainFm extends Application {
         stage.setHeight(stageInfo.getHeight());
         stage.requestFocus();
     }
-
-//    public static void doOCR(BufferedImage image) {
-//        isOcr.setValue(true);
-//        byte[] bytes = CommUtils.imageToBytes(image);
-//        isOcr.setValue(false);
-//        textArea.setText(OcrUtils.sogouWebOcr(bytes));
-//    }
 
     private static void initKeyHook(){
         try {
