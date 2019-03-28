@@ -38,3 +38,7 @@
 /*#topBar .separator{*/
     /*-fx-padding: 2px -5px 2px -2px;*/
 /*}*/
+
+#ocrTextArea{
+    -fx-text-fill: #343434;
+}

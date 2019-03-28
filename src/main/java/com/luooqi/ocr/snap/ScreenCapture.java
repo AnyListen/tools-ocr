@@ -405,20 +405,14 @@ public class ScreenCapture{
             return;
         } finally {
             mainCanvas.setDisable(false);
-            MainFm.restore();
+            MainFm.restore(false);
         }
-        Thread ocrThread = new Thread(()->{
-			byte[] bytes = CommUtils.imageToBytes(image);
-			String text = OcrUtils.sogouWebOcr(bytes);
-			Platform.runLater(()-> MainFm.textArea.setText(text));
-		});
-        ocrThread.setDaemon(false);
-        ocrThread.start();
+        MainFm.doOcr(image);
     }
 
     public void cancelSnap(){
         deActivateAllKeys();
-        MainFm.restore();
+        MainFm.restore(true);
     }
 
 	private int[] getRectangleBounds() {

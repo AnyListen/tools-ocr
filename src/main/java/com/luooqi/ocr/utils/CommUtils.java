@@ -35,7 +35,7 @@ public class CommUtils {
     public static final int BUTTON_SIZE = 28;
     public static Background BG_TRANSPARENT = new Background(new BackgroundFill(Color.TRANSPARENT,
             CornerRadii.EMPTY, Insets.EMPTY));
-    private static Pattern NORMAL_CHAR = Pattern.compile("[\\u4e00-\\u9fa5\\w、-]");
+    private static Pattern NORMAL_CHAR = Pattern.compile("[\\u4e00-\\u9fa5\\w、-，]");
     public static Separator SEPARATOR = new Separator(Orientation.VERTICAL);
     private static final float IMAGE_QUALITY = 0.5f;
     private static final int SAME_LINE_LIMIT = 8;
@@ -106,21 +106,26 @@ public class CommUtils {
             if (lastBlock != null) {
                 String blockTxt = lastBlock.getText().trim();
                 String endTxt = blockTxt.substring(blockTxt.length() - 1);
-                if (maxX - lastBlock.getTopRight().x >= CHAR_WIDTH ||
-                        (!NORMAL_CHAR.matcher(endTxt).find() &&
-                                (firstBlock.getTopLeft().x - minX) >= CHAR_WIDTH)) {
+                if (maxX - lastBlock.getTopRight().x >= CHAR_WIDTH * 2 ||
+                        !NORMAL_CHAR.matcher(endTxt).find() ||
+                        (NORMAL_CHAR.matcher(endTxt).find() &&
+                        (firstBlock.getTopLeft().x - minX) > CHAR_WIDTH * 2)){
                     sb.append("\n");
                     for (int i = 0, ln = (firstBlock.getTopLeft().x - minX) / CHAR_WIDTH; i < ln; i++) {
                         sb.append("  ");
                     }
                 }
             }
-            for (TextBlock text : line) {
+            for (int i = 0; i < line.size(); i++) {
+                TextBlock text = line.get(i);
                 String ocrText = text.getText();
-                sb.append(ocrText);
-                if (ocrText.matches("^\\w+$")) {
-                    sb.append(" ");
+                if (i > 0) {
+                    for (int a = 0, ln = (text.getTopLeft().x - line.get(i - 1).getTopRight().x) / CHAR_WIDTH;
+                         a < ln; a++) {
+                        sb.append(" ");
+                    }
                 }
+                sb.append(ocrText);
             }
             lastBlock = line.get(line.size() - 1);
         }

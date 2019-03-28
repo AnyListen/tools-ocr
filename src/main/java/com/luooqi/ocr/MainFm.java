@@ -2,11 +2,14 @@ package com.luooqi.ocr;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
+import com.luooqi.ocr.controller.ProcessController;
 import com.luooqi.ocr.model.StageInfo;
 import com.luooqi.ocr.snap.ScreenCapture;
 import com.luooqi.ocr.utils.CommUtils;
 import com.luooqi.ocr.utils.GlobalKeyListener;
+import com.luooqi.ocr.utils.OcrUtils;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -22,6 +25,7 @@ import javafx.stage.Stage;
 import org.jnativehook.GlobalScreen;
 
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.HashMap;
@@ -41,15 +45,16 @@ public class MainFm extends Application {
     public static Stage stage;
     private static Scene mainScene;
     private static ScreenCapture screenCapture;
+    private static ProcessController processController;
     public static TextArea textArea;
     //private static boolean isSegment = true;
     //private static String ocrText = "";
-    //private static BooleanProperty isOcr = new SimpleBooleanProperty(false);
 
     @Override
     public void start(Stage primaryStage) {
         stage = primaryStage;
         screenCapture = new ScreenCapture(stage);
+        processController = new ProcessController();
         initKeyHook();
 
 //        ToggleGroup segmentGrp = new ToggleGroup();
@@ -77,6 +82,8 @@ public class MainFm extends Application {
         topBar.setPadding(new Insets(6, 8, 6, 8));
 
         textArea = new TextArea();
+        textArea.setId("ocrTextArea");
+        textArea.setWrapText(false);
         textArea.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
 
         ToolBar footerBar = new ToolBar();
@@ -182,7 +189,22 @@ public class MainFm extends Application {
 //        textArea.setText(ocrText);
 //    }
 
-    public static void restore() {
+    public static void doOcr(BufferedImage image){
+        processController.show();
+        Thread ocrThread = new Thread(()->{
+            byte[] bytes = CommUtils.imageToBytes(image);
+            String text = OcrUtils.sogouWebOcr(bytes);
+            Platform.runLater(()-> {
+                processController.close();
+                stage.show();
+                textArea.setText(text);
+            });
+        });
+        ocrThread.setDaemon(false);
+        ocrThread.start();
+    }
+
+    public static void restore(boolean focus) {
         stage.setAlwaysOnTop(false);
         stage.setScene(mainScene);
         stage.setFullScreen(stageInfo.isFullScreenState());
@@ -190,7 +212,12 @@ public class MainFm extends Application {
         stage.setY(stageInfo.getY());
         stage.setWidth(stageInfo.getWidth());
         stage.setHeight(stageInfo.getHeight());
-        stage.requestFocus();
+        if (focus){
+            stage.requestFocus();
+        }
+        else{
+            stage.close();
+        }
     }
 
     private static void initKeyHook(){
