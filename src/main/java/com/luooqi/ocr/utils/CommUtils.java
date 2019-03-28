@@ -7,8 +7,9 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.model.TextBlock;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -26,12 +27,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class CommUtils {
 
     public static final Paint MASK_COLOR = Color.rgb(0, 0, 0, 0.4);
+    public static final int BUTTON_SIZE = 28;
     public static Background BG_TRANSPARENT = new Background(new BackgroundFill(Color.TRANSPARENT,
             CornerRadii.EMPTY, Insets.EMPTY));
+    private static Pattern NORMAL_CHAR = Pattern.compile("[\\u4e00-\\u9fa5\\w、-]");
+    public static Separator SEPARATOR = new Separator(Orientation.VERTICAL);
     private static final float IMAGE_QUALITY = 0.5f;
     private static final int SAME_LINE_LIMIT = 8;
     private static final int CHAR_WIDTH = 12;
@@ -43,7 +48,7 @@ public class CommUtils {
         MemoryCacheImageOutputStream outputStream = new MemoryCacheImageOutputStream(byteArrayOutputStream);
         try {
             Iterator iter = ImageIO.getImageWritersByFormatName("jpeg");
-            ImageWriter writer = (ImageWriter)iter.next();
+            ImageWriter writer = (ImageWriter) iter.next();
             ImageWriteParam iwp = writer.getDefaultWriteParam();
             iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
             iwp.setCompressionQuality(IMAGE_QUALITY);
@@ -68,9 +73,13 @@ public class CommUtils {
         List<TextBlock> lineBlock = new ArrayList<>();
         boolean sameLine = true;
         int minX = Integer.MAX_VALUE;
+        int maxX = -1;
         for (TextBlock textBlock : textBlocks) {
             if (textBlock.getTopLeft().x < minX) {
                 minX = textBlock.getTopLeft().x;
+            }
+            if (textBlock.getTopRight().x > maxX) {
+                maxX = textBlock.getTopRight().x;
             }
             if (lastY == -1) {
                 lastY = textBlock.getTopLeft().y;
@@ -91,20 +100,30 @@ public class CommUtils {
             lineBlocks.add(lineBlock);
         }
         StringBuilder sb = new StringBuilder();
-        int baseX = minX;
-        lineBlocks.forEach(line -> {
-            for (int i = 0, ln = (line.get(0).getTopLeft().x - baseX) / CHAR_WIDTH; i < ln; i++) {
-                sb.append("  ");
+        TextBlock lastBlock = null;
+        for (List<TextBlock> line : lineBlocks) {
+            TextBlock firstBlock = line.get(0);
+            if (lastBlock != null) {
+                String blockTxt = lastBlock.getText().trim();
+                String endTxt = blockTxt.substring(blockTxt.length() - 1);
+                if (maxX - lastBlock.getTopRight().x >= CHAR_WIDTH ||
+                        (!NORMAL_CHAR.matcher(endTxt).find() &&
+                                (firstBlock.getTopLeft().x - minX) >= CHAR_WIDTH)) {
+                    sb.append("\n");
+                    for (int i = 0, ln = (firstBlock.getTopLeft().x - minX) / CHAR_WIDTH; i < ln; i++) {
+                        sb.append("  ");
+                    }
+                }
             }
-            line.forEach(text -> {
+            for (TextBlock text : line) {
                 String ocrText = text.getText();
                 sb.append(ocrText);
-                if (ocrText.matches("^\\w+$")){
+                if (ocrText.matches("^\\w+$")) {
                     sb.append(" ");
                 }
-            });
-            sb.append("\n");
-        });
+            }
+            lastBlock = line.get(line.size() - 1);
+        }
         return sb.toString();
     }
 
@@ -150,14 +169,33 @@ public class CommUtils {
         return resultBytes;
     }
 
-    public static javafx.scene.control.Button createButton(String id, int size, Runnable action, String toolTip) {
+    public static Button createButton(String id, Runnable action, String toolTip){
+        return createButton(id, BUTTON_SIZE, action, toolTip);
+    }
+
+    public static Button createButton(String id, int size, Runnable action, String toolTip) {
         javafx.scene.control.Button button = new Button();
+        initButton(button, id, size, action, toolTip);
+        return button;
+    }
+
+    public static ToggleButton createToggleButton(ToggleGroup grp, String id, Runnable action, String toolTip){
+        return createToggleButton(grp, id, BUTTON_SIZE, action, toolTip);
+    }
+
+    public static ToggleButton createToggleButton(ToggleGroup grp, String id, int size, Runnable action, String toolTip) {
+        ToggleButton button = new ToggleButton();
+        button.setToggleGroup(grp);
+        initButton(button, id, size, action, toolTip);
+        return button;
+    }
+
+    private static void initButton(ButtonBase button, String id, int size, Runnable action, String toolTip) {
         button.setId(id);
         button.setOnAction(evt -> action.run());
         button.setMinSize(size, size);
         if (toolTip != null) {
             button.setTooltip(new Tooltip(toolTip));
         }
-        return button;
     }
 }

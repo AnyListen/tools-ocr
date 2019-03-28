@@ -10,9 +10,7 @@ import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
@@ -44,6 +42,8 @@ public class MainFm extends Application {
     private static Scene mainScene;
     private static ScreenCapture screenCapture;
     public static TextArea textArea;
+    //private static boolean isSegment = true;
+    //private static String ocrText = "";
     //private static BooleanProperty isOcr = new SimpleBooleanProperty(false);
 
     @Override
@@ -52,15 +52,28 @@ public class MainFm extends Application {
         screenCapture = new ScreenCapture(stage);
         initKeyHook();
 
+//        ToggleGroup segmentGrp = new ToggleGroup();
+//        ToggleButton resetBtn = CommUtils.createToggleButton(segmentGrp, "resetBtn", this::resetText, "重置");
+//        ToggleButton segmentBtn = CommUtils.createToggleButton(segmentGrp, "segmentBtn", this::segmentText, "智能分段");
+//        resetBtn.setUserData("resetBtn");
+//        segmentBtn.setUserData("segmentBtn");
+//
+//        segmentGrp.selectToggle(segmentBtn);
+//        segmentGrp.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+//            isSegment = newValue.getUserData().toString().equals("segmentBtn");
+//        });
+
         HBox topBar = new HBox(
-                CommUtils.createButton("snapBtn", 28, MainFm::doSnap, "截图"),
-                CommUtils.createButton("copyBtn", 28, this::copyText, "复制"),
-                CommUtils.createButton("pasteBtn", 28, this::pasteText, "粘贴"),
-                CommUtils.createButton("clearBtn", 28, this::clearText, "清空"),
-                CommUtils.createButton("wrapBtn", 28, this::wrapText, "换行")
+                CommUtils.createButton("snapBtn", MainFm::doSnap, "截图"),
+                CommUtils.createButton("copyBtn", this::copyText, "复制"),
+                CommUtils.createButton("pasteBtn", this::pasteText, "粘贴"),
+                CommUtils.createButton("clearBtn", this::clearText, "清空"),
+                CommUtils.createButton("wrapBtn", this::wrapText, "换行")
+                //CommUtils.SEPARATOR, resetBtn, segmentBtn
         );
+        topBar.setId("topBar");
         topBar.setMinHeight(40);
-        topBar.setSpacing(10);
+        topBar.setSpacing(8);
         topBar.setPadding(new Insets(6, 8, 6, 8));
 
         textArea = new TextArea();
@@ -156,6 +169,18 @@ public class MainFm extends Application {
     public static void cancelSnap() {
         runLater(screenCapture::cancelSnap);
     }
+
+//    public static void setOcrResult(String text){
+//        ocrText = text;
+//    }
+//
+//    private void segmentText() {
+//        textArea.setText(ocrText);
+//    }
+//
+//    private void resetText() {
+//        textArea.setText(ocrText);
+//    }
 
     public static void restore() {
         stage.setAlwaysOnTop(false);

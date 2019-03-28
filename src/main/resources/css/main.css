@@ -1,21 +1,3 @@
-#menuBar {
-    -fx-background-color: rgb(57,73,171);
-}
-
-#menuBar .label {
-    -fx-text-fill: rgb(255, 255, 255);
-    -fx-padding: 4 8 4 8;
-}
-
-#menuBar #mainMenuOption .label {
-    -fx-font-family: 'sans-serif';
-    -fx-font-weight: bold;
-}
-
-.menu-item .label {
-    -fx-text-fill: rgb(0, 0, 0) !important;
-}
-
 .button.pressed { -fx-background-color: ghostwhite; }
 
 .button, .toggle-button {
@@ -44,3 +26,15 @@
 #wrapBtn{
     -fx-background-image: url(/img/wrap.png);
 }
+
+/*#resetBtn{*/
+    /*-fx-background-image: url(/img/reset.png);*/
+/*}*/
+
+/*#segmentBtn{*/
+    /*-fx-background-image: url(/img/segment.png);*/
+/*}*/
+
+/*#topBar .separator{*/
+    /*-fx-padding: 2px -5px 2px -2px;*/
+/*}*/
