@@ -6,7 +6,11 @@
 
     <groupId>com.luooqi</groupId>
     <artifactId>treehole</artifactId>
-    <version>1.1.0</version>
+    <version>${soft.version}</version>
+
+    <properties>
+        <soft.version>1.1.0</soft.version>
+    </properties>
 
     <dependencies>
 
@@ -80,9 +84,10 @@
                     <verbose>true</verbose>
                     <vendor>com.luooqi</vendor>
                     <needShortcut>true</needShortcut>
-                    <bundleArguments>
-                        <runtime />
-                    </bundleArguments>
+                    <!--<bundleArguments>-->
+                        <!--<runtime />-->
+                    <!--</bundleArguments>-->
+                    <nativeReleaseVersion>${soft.version}</nativeReleaseVersion>
                 </configuration>
             </plugin>
         </plugins>
