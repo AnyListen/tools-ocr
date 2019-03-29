@@ -16,6 +16,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -32,7 +33,7 @@ import java.awt.image.BufferedImage;
  *
  * @author GOXR3PLUS
  */
-public class ScreenCapture{
+public class ScreenCapture {
 
 	private BorderPane rootPane;
 	private Canvas mainCanvas;
@@ -284,8 +285,8 @@ public class ScreenCapture{
 				isSnapping = false;
 			} else if (key.getCode() == KeyCode.ENTER || key.getCode() == KeyCode.SPACE) {
 				deActivateAllKeys();
-				prepareImage();
 				isSnapping = false;
+				prepareImage();
 			}
 		});
 
@@ -295,6 +296,14 @@ public class ScreenCapture{
 				yPressedAnimation.start();
 			} else {
 				yPressedAnimation.stop();
+			}
+		});
+
+		rootPane.setOnMouseClicked(event -> {
+			if (event.getClickCount() > 1){
+				if (data.rectWidth * data.rectHeight > 0){
+					rootPane.fireEvent(new KeyEvent(KeyEvent.KEY_RELEASED, "", "", KeyCode.ENTER, false, false, false, false));
+				}
 			}
 		});
 	}
@@ -344,7 +353,7 @@ public class ScreenCapture{
 		gc.clearRect(data.rectUpperLeftX, data.rectUpperLeftY, data.rectWidth, data.rectHeight);
 
 		// draw the text
-		if (!data.hideExtraFeatures.getValue() && (data.rectWidth > 0 ||  data.rectHeight > 0)) {
+		if (!data.hideExtraFeatures.getValue() && (data.rectWidth > 0 || data.rectHeight > 0)) {
 			double middle = data.rectUpperLeftX + data.rectWidth / 2.00;
 			gc.setLineWidth(1);
 			gc.setFill(Color.FIREBRICK);
@@ -369,11 +378,10 @@ public class ScreenCapture{
 	public void prepareForCapture() {
 		isSnapping = true;
 		MainFm.stage.close();
-		Platform.runLater(()->{
+		Platform.runLater(() -> {
 			try {
-				Thread.sleep(150);
-			}
-			catch (InterruptedException e) {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
 				StaticLog.error(e);
 			}
 			BufferedImage bufferedImage = ScreenUtil.captureScreen();
@@ -384,38 +392,33 @@ public class ScreenCapture{
 					BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
 					BackgroundPosition.CENTER, new BackgroundSize(data.screenWidth, data.screenHeight, false, false, true, true))));
 			repaintCanvas();
+			stage.setScene(scene);
 			stage.setFullScreenExitHint("");
 			stage.setFullScreen(true);
 			stage.setAlwaysOnTop(true);
-			stage.setScene(scene);
 			stage.show();
 		});
 
 	}
 
-    private void prepareImage() {
-        gc.clearRect(0, 0, stage.getWidth(), stage.getHeight());
-        BufferedImage image;
-        int[] rect = getRectangleBounds();
-        try {
-            mainCanvas.setDisable(true);
-            image = new Robot().createScreenCapture(new Rectangle(rect[0], rect[1], rect[2], rect[3]));
-        } catch (AWTException ex) {
-            StaticLog.error(ex);
-            return;
-        } finally {
-            mainCanvas.setDisable(false);
-            MainFm.restore(false);
-        }
-        MainFm.doOcr(image);
-    }
+	private void prepareImage() {
+		gc.clearRect(0, 0, stage.getWidth(), stage.getHeight());
+		BufferedImage image;
+		try {
+			mainCanvas.setDisable(true);
+			image = new Robot().createScreenCapture(new Rectangle(data.rectUpperLeftX, data.rectUpperLeftY, data.rectWidth, data.rectHeight));
+		} catch (AWTException ex) {
+			StaticLog.error(ex);
+			return;
+		} finally {
+			mainCanvas.setDisable(false);
+			MainFm.restore(false);
+		}
+		MainFm.doOcr(image);
+	}
 
-    public void cancelSnap(){
-        deActivateAllKeys();
-        MainFm.restore(true);
-    }
-
-	private int[] getRectangleBounds() {
-		return new int[]{data.rectUpperLeftX, data.rectUpperLeftY, data.rectWidth, data.rectHeight};
+	public void cancelSnap() {
+		deActivateAllKeys();
+		MainFm.restore(true);
 	}
 }

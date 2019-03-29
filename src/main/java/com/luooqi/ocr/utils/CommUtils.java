@@ -5,6 +5,7 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.log.StaticLog;
+import com.luooqi.ocr.MainFm;
 import com.luooqi.ocr.model.TextBlock;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -15,16 +16,20 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.stage.Stage;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.List;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -42,6 +47,13 @@ public class CommUtils {
     private static final int CHAR_WIDTH = 12;
     public static final String STYLE_TRANSPARENT = "-fx-background-color: transparent;";
     public static final String SPECIAL_CHARS = "[\\s`~!@#$%^&*()_\\-+=|{}':;,\\[\\].<>/?！￥…（）【】‘；：”“’。，、？]+";
+    public static boolean IS_MAC_OS = false;
+    static {
+        String osName = System.getProperty("os.name", "generic").toLowerCase();
+        if ((osName.contains("mac")) || (osName.contains("darwin"))) {
+            IS_MAC_OS = true;
+        }
+    }
 
     public static byte[] imageToBytes(BufferedImage img) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -202,5 +214,27 @@ public class CommUtils {
         if (toolTip != null) {
             button.setTooltip(new Tooltip(toolTip));
         }
+    }
+
+    public static void initStage(Stage stage) {
+        try {
+            if (CommUtils.IS_MAC_OS) {
+                URL iconURL = MainFm.class.getResource("/img/logo.png");
+                java.awt.Image image = new ImageIcon(iconURL).getImage();
+                Class appleApp = Class.forName("com.apple.eawt.Application");
+                //noinspection unchecked
+                Method getApplication = appleApp.getMethod("getApplication");
+                Object application = getApplication.invoke(appleApp);
+                Class[] params = new Class[1];
+                params[0] = java.awt.Image.class;
+                //noinspection unchecked
+                Method setDockIconImage = appleApp.getMethod("setDockIconImage", params);
+                setDockIconImage.invoke(application, image);
+            }
+        } catch (Exception e) {
+            StaticLog.error(e);
+        }
+        stage.setTitle("树洞OCR文字识别");
+        stage.getIcons().add(new javafx.scene.image.Image(MainFm.class.getResource("/img/logo.png").toExternalForm()));
     }
 }

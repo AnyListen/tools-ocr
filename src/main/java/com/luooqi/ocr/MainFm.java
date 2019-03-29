@@ -1,7 +1,6 @@
 package com.luooqi.ocr;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.controller.ProcessController;
 import com.luooqi.ocr.model.StageInfo;
 import com.luooqi.ocr.snap.ScreenCapture;
@@ -13,8 +12,9 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.image.Image;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.ToolBar;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 import javafx.scene.layout.BorderPane;
@@ -24,10 +24,7 @@ import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
 import org.jnativehook.GlobalScreen;
 
-import javax.swing.*;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -46,7 +43,7 @@ public class MainFm extends Application {
     private static Scene mainScene;
     private static ScreenCapture screenCapture;
     private static ProcessController processController;
-    public static TextArea textArea;
+    private static TextArea textArea;
     //private static boolean isSegment = true;
     //private static String ocrText = "";
 
@@ -93,7 +90,6 @@ public class MainFm extends Application {
         textArea.textProperty().addListener((observable, oldValue, newValue) -> statsProperty.set("总字数：" + newValue.replaceAll(CommUtils.SPECIAL_CHARS, "").length()));
         statsLabel.textProperty().bind(statsProperty);
         footerBar.getItems().add(statsLabel);
-
         BorderPane root = new BorderPane();
         root.setTop(topBar);
         root.setCenter(textArea);
@@ -101,8 +97,7 @@ public class MainFm extends Application {
         root.getStylesheets().addAll(
                 getClass().getResource("/css/main.css").toExternalForm()
         );
-
-        initStage(primaryStage);
+        CommUtils.initStage(primaryStage);
         mainScene = new Scene(root, 420, 475);
         stage.setScene(mainScene);
         stage.show();
@@ -110,29 +105,6 @@ public class MainFm extends Application {
 
     private void wrapText() {
         textArea.setWrapText(!textArea.isWrapText());
-    }
-
-    private void initStage(Stage primaryStage) {
-        try {
-            String osName = System.getProperty("os.name", "generic").toLowerCase();
-            if ((osName.contains("mac")) || (osName.contains("darwin"))) {
-                URL iconURL = MainFm.class.getResource("/img/logo.png");
-                java.awt.Image image = new ImageIcon(iconURL).getImage();
-                Class appleApp = Class.forName("com.apple.eawt.Application");
-                //noinspection unchecked
-                Method getApplication = appleApp.getMethod("getApplication");
-                Object application = getApplication.invoke(appleApp);
-                Class[] params = new Class[1];
-                params[0] = java.awt.Image.class;
-                //noinspection unchecked
-                Method setDockIconImage = appleApp.getMethod("setDockIconImage", params);
-                setDockIconImage.invoke(application, image);
-            }
-        } catch (Exception e) {
-            StaticLog.error(e);
-        }
-        primaryStage.setTitle("树洞OCR文字识别");
-        primaryStage.getIcons().add(new Image(getClass().getResource("/img/logo.png").toExternalForm()));
     }
 
     @Override
@@ -177,18 +149,6 @@ public class MainFm extends Application {
         runLater(screenCapture::cancelSnap);
     }
 
-//    public static void setOcrResult(String text){
-//        ocrText = text;
-//    }
-//
-//    private void segmentText() {
-//        textArea.setText(ocrText);
-//    }
-//
-//    private void resetText() {
-//        textArea.setText(ocrText);
-//    }
-
     public static void doOcr(BufferedImage image){
         processController.show();
         Thread ocrThread = new Thread(()->{
@@ -196,8 +156,8 @@ public class MainFm extends Application {
             String text = OcrUtils.sogouWebOcr(bytes);
             Platform.runLater(()-> {
                 processController.close();
-                stage.show();
                 textArea.setText(text);
+                restore(true);
             });
         });
         ocrThread.setDaemon(false);
@@ -213,6 +173,7 @@ public class MainFm extends Application {
         stage.setWidth(stageInfo.getWidth());
         stage.setHeight(stageInfo.getHeight());
         if (focus){
+            stage.show();
             stage.requestFocus();
         }
         else{

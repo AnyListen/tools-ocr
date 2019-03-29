@@ -63,6 +63,7 @@ public class OcrUtils {
             JSONObject jObj = jsonArray.getJSONObject(i);
             TextBlock textBlock = new TextBlock();
             textBlock.setText(jObj.getStr("content").trim());
+            //noinspection SuspiciousToArrayCall
             String[] frames = jObj.getJSONArray("frame").toArray(new String[0]);
             textBlock.setTopLeft(CommUtils.frameToPoint(frames[0]));
             textBlock.setTopRight(CommUtils.frameToPoint(frames[1]));
