@@ -84,9 +84,9 @@
                     <verbose>true</verbose>
                     <vendor>com.luooqi</vendor>
                     <needShortcut>true</needShortcut>
-                    <!--<bundleArguments>-->
-                        <!--<runtime />-->
-                    <!--</bundleArguments>-->
+                    <bundleArguments>
+                        <runtime />
+                    </bundleArguments>
                     <nativeReleaseVersion>${soft.version}</nativeReleaseVersion>
                 </configuration>
             </plugin>

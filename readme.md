@@ -1,7 +1,11 @@
 ## 树洞 OCR 文字识别
 一款跨平台的 OCR 小工具
 
-> - 文字识别使用了各云平台开发的识别接口，因此需要联网才能正常使用;
+百度网盘：[https://pan.baidu.com/s/1gVVQ58fZ8ori-O7rWKpRPQ](https://pan.baidu.com/s/1gVVQ58fZ8ori-O7rWKpRPQ)
+提取码：m6d8 
+
+> `xxx-with-jre.xx` 是完整版，带运行环境；如果移除运行环境的不能正常工作，请下载完整版使用；
+> - 文字识别使用了各云平台开发的识别接口，因此需要联网才能正常使用；
 > - 本程序使用 JavaFX 开发，使用前请务必安装 **Java8** 运行环境。
 
 ![截图](http://img.luooqi.com/FqzQ_arDyqsYOXcRoFNQ_Hezyoqo)
