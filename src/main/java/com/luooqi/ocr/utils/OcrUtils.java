@@ -59,6 +59,7 @@ public class OcrUtils {
         }
         JSONArray jsonArray = jsonObject.getJSONArray("result");
         List<TextBlock> textBlocks = new ArrayList<>();
+        boolean isEng = false;
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject jObj = jsonArray.getJSONObject(i);
             TextBlock textBlock = new TextBlock();
@@ -71,7 +72,8 @@ public class OcrUtils {
             textBlock.setBottomLeft(CommUtils.frameToPoint(frames[3]));
             textBlocks.add(textBlock);
         }
-        return CommUtils.combineTextBlocks(textBlocks);
+        isEng = jsonObject.getStr("lang", "zh-Chs").equals("zh-Chs");
+        return CommUtils.combineTextBlocks(textBlocks, isEng);
     }
 
 }

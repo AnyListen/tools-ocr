@@ -1,5 +1,6 @@
 package com.luooqi.ocr.utils;
 
+import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -40,7 +41,7 @@ public class CommUtils {
     public static final int BUTTON_SIZE = 28;
     public static Background BG_TRANSPARENT = new Background(new BackgroundFill(Color.TRANSPARENT,
             CornerRadii.EMPTY, Insets.EMPTY));
-    private static Pattern NORMAL_CHAR = Pattern.compile("[\\u4e00-\\u9fa5\\w、-，]");
+    private static Pattern NORMAL_CHAR = Pattern.compile("[\\u4e00-\\u9fa5\\w、-，/|_]");
     public static Separator SEPARATOR = new Separator(Orientation.VERTICAL);
     private static final float IMAGE_QUALITY = 0.5f;
     private static final int SAME_LINE_LIMIT = 8;
@@ -78,20 +79,29 @@ public class CommUtils {
         }
     }
 
-    static String combineTextBlocks(List<TextBlock> textBlocks) {
+    static String combineTextBlocks(List<TextBlock> textBlocks, boolean isEng) {
         textBlocks.sort(Comparator.comparingInt(o -> o.getTopLeft().y));
         List<List<TextBlock>> lineBlocks = new ArrayList<>();
         int lastY = -1;
         List<TextBlock> lineBlock = new ArrayList<>();
         boolean sameLine = true;
         int minX = Integer.MAX_VALUE;
+        TextBlock minBlock = null;
+        TextBlock maxBlock = null;
         int maxX = -1;
+        double maxAngle = -100;
         for (TextBlock textBlock : textBlocks) {
+            System.out.println(textBlock.getAngle()+ "\t" + textBlock.getFontSize());
             if (textBlock.getTopLeft().x < minX) {
                 minX = textBlock.getTopLeft().x;
+                minBlock = textBlock;
             }
             if (textBlock.getTopRight().x > maxX) {
                 maxX = textBlock.getTopRight().x;
+                maxBlock = textBlock;
+            }
+            if (Math.abs(textBlock.getAngle()) > maxAngle){
+                maxAngle = Math.abs(textBlock.getAngle());
             }
             if (lastY == -1) {
                 lastY = textBlock.getTopLeft().y;
@@ -107,6 +117,11 @@ public class CommUtils {
             }
             lineBlock.add(textBlock);
         }
+
+        if (maxAngle >= 0.05){
+            //todo 文本倾斜校正
+        }
+
         if (lineBlock.size() > 0) {
             lineBlock.sort(Comparator.comparingInt(o -> o.getTopLeft().x));
             lineBlocks.add(lineBlock);
@@ -124,17 +139,32 @@ public class CommUtils {
                         (firstBlock.getTopLeft().x - minX) > CHAR_WIDTH * 2)){
                     sb.append("\n");
                     for (int i = 0, ln = (firstBlock.getTopLeft().x - minX) / CHAR_WIDTH; i < ln; i++) {
-                        sb.append("  ");
+                        if (i % 2 == 0){
+                            sb.append("    ");
+                        }
+                    }
+                }
+                else{
+                    if (CharUtil.isLetterOrNumber(endTxt.charAt(0)) && CharUtil.isLetterOrNumber(firstBlock.getText().charAt(0))){
+                        sb.append(" ");
                     }
                 }
             }
+            else{
+                for (int i = 0, ln = (firstBlock.getTopLeft().x - minX) / CHAR_WIDTH; i < ln; i++) {
+                    if (i % 2 == 0){
+                        sb.append("    ");
+                    }
+                }
+            }
+
             for (int i = 0; i < line.size(); i++) {
                 TextBlock text = line.get(i);
                 String ocrText = text.getText();
                 if (i > 0) {
-                    for (int a = 0, ln = (text.getTopLeft().x - line.get(i - 1).getTopRight().x) / CHAR_WIDTH;
+                    for (int a = 0, ln = (text.getTopLeft().x - line.get(i - 1).getTopRight().x) / (CHAR_WIDTH * 2);
                          a < ln; a++) {
-                        sb.append(" ");
+                        sb.append("  ");
                     }
                 }
                 sb.append(ocrText);

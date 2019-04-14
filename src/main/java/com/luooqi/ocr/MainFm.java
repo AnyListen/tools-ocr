@@ -17,8 +17,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.Stage;
@@ -81,6 +81,7 @@ public class MainFm extends Application {
         textArea = new TextArea();
         textArea.setId("ocrTextArea");
         textArea.setWrapText(false);
+        textArea.setBorder(new Border(new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         textArea.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
 
         ToolBar footerBar = new ToolBar();
