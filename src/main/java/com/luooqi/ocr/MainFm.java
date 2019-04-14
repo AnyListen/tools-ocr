@@ -1,7 +1,9 @@
 package com.luooqi.ocr;
 
+import cn.hutool.core.swing.ScreenUtil;
 import cn.hutool.core.util.StrUtil;
 import com.luooqi.ocr.controller.ProcessController;
+import com.luooqi.ocr.model.CaptureInfo;
 import com.luooqi.ocr.model.StageInfo;
 import com.luooqi.ocr.snap.ScreenCapture;
 import com.luooqi.ocr.utils.CommUtils;
@@ -80,7 +82,7 @@ public class MainFm extends Application {
 
         textArea = new TextArea();
         textArea.setId("ocrTextArea");
-        textArea.setWrapText(false);
+        textArea.setWrapText(true);
         textArea.setBorder(new Border(new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         textArea.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
 
@@ -99,7 +101,7 @@ public class MainFm extends Application {
                 getClass().getResource("/css/main.css").toExternalForm()
         );
         CommUtils.initStage(primaryStage);
-        mainScene = new Scene(root, 420, 475);
+        mainScene = new Scene(root, 670, 470);
         stage.setScene(mainScene);
         stage.show();
     }
@@ -151,6 +153,8 @@ public class MainFm extends Application {
     }
 
     public static void doOcr(BufferedImage image){
+        processController.setX(CaptureInfo.ScreenBaseX + (CaptureInfo.screenWidth - 300)/2 );
+        processController.setY(250);
         processController.show();
         Thread ocrThread = new Thread(()->{
             byte[] bytes = CommUtils.imageToBytes(image);

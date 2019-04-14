@@ -6,7 +6,6 @@ import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.MainFm;
 import com.luooqi.ocr.model.CaptureInfo;
 import com.luooqi.ocr.utils.CommUtils;
-import com.luooqi.ocr.utils.OcrUtils;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -162,15 +161,19 @@ public class ScreenCapture {
 		mainCanvas.setHeight(data.screenHeight);
 		mainCanvas.setOnMousePressed(m -> {
 			if (m.getButton() == MouseButton.PRIMARY) {
-				data.mouseXPressed = (int) m.getScreenX();
-				data.mouseYPressed = (int) m.getScreenY();
+				//data.mouseXPressed = (int) m.getScreenX();
+				//data.mouseYPressed = (int) m.getScreenY();
+				data.mouseXPressed = (int) m.getX();
+				data.mouseYPressed = (int) m.getY();
 			}
 		});
 
 		mainCanvas.setOnMouseDragged(m -> {
 			if (m.getButton() == MouseButton.PRIMARY) {
-				data.mouseXNow = (int) m.getScreenX();
-				data.mouseYNow = (int) m.getScreenY();
+				//data.mouseXNow = (int) m.getScreenX();
+				//data.mouseYNow = (int) m.getScreenY();
+				data.mouseXNow = (int) m.getX();
+				data.mouseYNow = (int) m.getY();
 				repaintCanvas();
 			}
 		});
@@ -384,10 +387,23 @@ public class ScreenCapture {
 			} catch (InterruptedException e) {
 				StaticLog.error(e);
 			}
-			BufferedImage bufferedImage = ScreenUtil.captureScreen();
+			Rectangle rectangle = CommUtils.snapScreen(MainFm.stage);
+			data.ScreenBaseX = rectangle.x;
+			BufferedImage bufferedImage = ScreenUtil.captureScreen(rectangle);
 			bufferedImage = Scalr.resize(bufferedImage, Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, data.screenWidth * 2, data.screenHeight * 2);
 			WritableImage fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
 			data.reset();
+			data.ScreenBaseX = rectangle.x;
+			data.screenWidth = rectangle.width;
+			data.screenHeight = rectangle.height;
+			deActivateAllKeys();
+			scene.setRoot(new Pane());
+			scene = new Scene(rootPane, data.screenWidth, data.screenHeight, Color.TRANSPARENT);
+			addKeyHandlers();
+			mainCanvas.setWidth(data.screenWidth);
+			mainCanvas.setHeight(data.screenHeight);
+			mainCanvas.setCursor(Cursor.CROSSHAIR);
+			initGraphContent();
 			rootPane.setBackground(new Background(new BackgroundImage(fxImage,
 					BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
 					BackgroundPosition.CENTER, new BackgroundSize(data.screenWidth, data.screenHeight, false, false, true, true))));
@@ -398,7 +414,6 @@ public class ScreenCapture {
 			stage.setAlwaysOnTop(true);
 			stage.show();
 		});
-
 	}
 
 	private void prepareImage() {
@@ -406,7 +421,7 @@ public class ScreenCapture {
 		BufferedImage image;
 		try {
 			mainCanvas.setDisable(true);
-			image = new Robot().createScreenCapture(new Rectangle(data.rectUpperLeftX, data.rectUpperLeftY, data.rectWidth, data.rectHeight));
+			image = new Robot().createScreenCapture(new Rectangle(data.rectUpperLeftX + data.ScreenBaseX, data.rectUpperLeftY, data.rectWidth, data.rectHeight));
 		} catch (AWTException ex) {
 			StaticLog.error(ex);
 			return;

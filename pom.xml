@@ -9,7 +9,7 @@
     <version>${soft.version}</version>
 
     <properties>
-        <soft.version>1.1.0</soft.version>
+        <soft.version>1.2.0</soft.version>
     </properties>
 
     <dependencies>
@@ -77,7 +77,7 @@
                 <version>8.8.3</version>
                 <configuration>
                     <mainClass>com.luooqi.ocr.MainFm</mainClass>
-                    <bundler>exe</bundler>
+                    <bundler>dmg</bundler>
                     <jfxAppOutputDir>${project.build.directory}/app</jfxAppOutputDir>
                     <nativeOutputDir>${project.build.directory}/native</nativeOutputDir>
                     <appName>treehole</appName>

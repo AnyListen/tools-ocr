@@ -1,5 +1,7 @@
 package com.luooqi.ocr.utils;
 
+import cn.hutool.core.swing.RobotUtil;
+import cn.hutool.core.swing.ScreenUtil;
 import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
@@ -10,6 +12,8 @@ import com.luooqi.ocr.MainFm;
 import com.luooqi.ocr.model.TextBlock;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
@@ -17,6 +21,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import javax.imageio.IIOImage;
@@ -266,5 +271,20 @@ public class CommUtils {
         }
         stage.setTitle("树洞OCR文字识别");
         stage.getIcons().add(new javafx.scene.image.Image(MainFm.class.getResource("/img/logo.png").toExternalForm()));
+    }
+
+    public static Rectangle snapScreen(Stage stage){
+        double x = stage.getX();
+        Screen crtScreen = null;
+        for (Screen screen : Screen.getScreens()) {
+            crtScreen = screen;
+            Rectangle2D bounds = screen.getBounds();
+            if (bounds.getMaxX() > x){
+                break;
+            }
+        }
+        Rectangle2D rectangle2D = crtScreen.getBounds();
+        return new Rectangle((int)rectangle2D.getMinX (), (int)rectangle2D.getMinY(), (int) rectangle2D.getWidth(),
+                (int) rectangle2D.getHeight());
     }
 }
