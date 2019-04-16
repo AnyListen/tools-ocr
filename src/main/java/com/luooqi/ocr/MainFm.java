@@ -1,6 +1,5 @@
 package com.luooqi.ocr;
 
-import cn.hutool.core.swing.ScreenUtil;
 import cn.hutool.core.util.StrUtil;
 import com.luooqi.ocr.controller.ProcessController;
 import com.luooqi.ocr.model.CaptureInfo;
@@ -153,7 +152,7 @@ public class MainFm extends Application {
     }
 
     public static void doOcr(BufferedImage image){
-        processController.setX(CaptureInfo.ScreenBaseX + (CaptureInfo.screenWidth - 300)/2 );
+        processController.setX(CaptureInfo.ScreenMinX + (CaptureInfo.ScreenWidth - 300)/2 );
         processController.setY(250);
         processController.show();
         Thread ocrThread = new Thread(()->{

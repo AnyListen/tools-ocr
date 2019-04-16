@@ -133,6 +133,19 @@ public class ScreenCapture {
 						}
 					}
 				}
+
+				if (data.mouseXPressed < 0){
+					data.mouseXPressed = 0;
+				}
+				if (data.mouseXNow < 0){
+					data.mouseXNow = 0;
+				}
+				if (data.mouseXPressed > CaptureInfo.ScreenWidth){
+					data.mouseXPressed = CaptureInfo.ScreenWidth;
+				}
+				if (data.mouseXNow > CaptureInfo.ScreenWidth){
+					data.mouseXNow = CaptureInfo.ScreenWidth;
+				}
 				repaintCanvas();
 			}
 		}
@@ -151,18 +164,16 @@ public class ScreenCapture {
 		rootPane.getChildren().add(mainCanvas);
 
 		// Scene
-		scene = new Scene(rootPane, data.screenWidth, data.screenHeight, Color.TRANSPARENT);
+		scene = new Scene(rootPane, CaptureInfo.ScreenWidth, CaptureInfo.ScreenHeight, Color.TRANSPARENT);
 		scene.setCursor(Cursor.NONE);
 
 		addKeyHandlers();
 
 		// Canvas
-		mainCanvas.setWidth(data.screenWidth);
-		mainCanvas.setHeight(data.screenHeight);
+		mainCanvas.setWidth(CaptureInfo.ScreenWidth);
+		mainCanvas.setHeight(CaptureInfo.ScreenHeight);
 		mainCanvas.setOnMousePressed(m -> {
 			if (m.getButton() == MouseButton.PRIMARY) {
-				//data.mouseXPressed = (int) m.getScreenX();
-				//data.mouseYPressed = (int) m.getScreenY();
 				data.mouseXPressed = (int) m.getX();
 				data.mouseYPressed = (int) m.getY();
 			}
@@ -170,10 +181,20 @@ public class ScreenCapture {
 
 		mainCanvas.setOnMouseDragged(m -> {
 			if (m.getButton() == MouseButton.PRIMARY) {
-				//data.mouseXNow = (int) m.getScreenX();
-				//data.mouseYNow = (int) m.getScreenY();
-				data.mouseXNow = (int) m.getX();
-				data.mouseYNow = (int) m.getY();
+				if (m.getScreenX() >= CaptureInfo.ScreenMinX &&
+						m.getScreenX() <= CaptureInfo.ScreenMaxX){
+					data.mouseXNow = (int) m.getX();
+				}
+				else if(m.getScreenX() > CaptureInfo.ScreenMaxX){
+					data.mouseXNow = CaptureInfo.ScreenWidth;
+				}
+
+				if (m.getScreenY() <= CaptureInfo.ScreenHeight){
+					data.mouseYNow = (int) m.getY();
+				}
+				else{
+					data.mouseYNow = CaptureInfo.ScreenHeight;
+				}
 				repaintCanvas();
 			}
 		});
@@ -327,9 +348,9 @@ public class ScreenCapture {
 	 * Repaint the canvas of the capture window.
 	 */
 	private void repaintCanvas() {
-		gc.clearRect(0, 0, data.screenWidth, data.screenHeight);
+		gc.clearRect(0, 0, CaptureInfo.ScreenWidth, CaptureInfo.ScreenHeight);
 		gc.setFill(CommUtils.MASK_COLOR);
-		gc.fillRect(0, 0, data.screenWidth, data.screenHeight);
+		gc.fillRect(0, 0, CaptureInfo.ScreenWidth, CaptureInfo.ScreenHeight);
 
 		gc.setFont(data.font);
 		gc.setStroke(Color.RED);
@@ -388,25 +409,25 @@ public class ScreenCapture {
 				StaticLog.error(e);
 			}
 			Rectangle rectangle = CommUtils.snapScreen(MainFm.stage);
-			data.ScreenBaseX = rectangle.x;
-			BufferedImage bufferedImage = ScreenUtil.captureScreen(rectangle);
-			bufferedImage = Scalr.resize(bufferedImage, Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, data.screenWidth * 2, data.screenHeight * 2);
-			WritableImage fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
 			data.reset();
-			data.ScreenBaseX = rectangle.x;
-			data.screenWidth = rectangle.width;
-			data.screenHeight = rectangle.height;
+			CaptureInfo.ScreenMinX = rectangle.x;
+			CaptureInfo.ScreenMaxX = rectangle.x + rectangle.width;
+			CaptureInfo.ScreenWidth = rectangle.width;
+			CaptureInfo.ScreenHeight = rectangle.height;
+			BufferedImage bufferedImage = ScreenUtil.captureScreen(rectangle);
+			bufferedImage = Scalr.resize(bufferedImage, Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, CaptureInfo.ScreenWidth * 2, CaptureInfo.ScreenHeight * 2);
+			WritableImage fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
 			deActivateAllKeys();
 			scene.setRoot(new Pane());
-			scene = new Scene(rootPane, data.screenWidth, data.screenHeight, Color.TRANSPARENT);
+			scene = new Scene(rootPane, CaptureInfo.ScreenWidth, CaptureInfo.ScreenHeight, Color.TRANSPARENT);
 			addKeyHandlers();
-			mainCanvas.setWidth(data.screenWidth);
-			mainCanvas.setHeight(data.screenHeight);
+			mainCanvas.setWidth(CaptureInfo.ScreenWidth);
+			mainCanvas.setHeight(CaptureInfo.ScreenHeight);
 			mainCanvas.setCursor(Cursor.CROSSHAIR);
 			initGraphContent();
 			rootPane.setBackground(new Background(new BackgroundImage(fxImage,
 					BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
-					BackgroundPosition.CENTER, new BackgroundSize(data.screenWidth, data.screenHeight, false, false, true, true))));
+					BackgroundPosition.CENTER, new BackgroundSize(CaptureInfo.ScreenWidth, CaptureInfo.ScreenHeight, false, false, true, true))));
 			repaintCanvas();
 			stage.setScene(scene);
 			stage.setFullScreenExitHint("");
@@ -421,7 +442,7 @@ public class ScreenCapture {
 		BufferedImage image;
 		try {
 			mainCanvas.setDisable(true);
-			image = new Robot().createScreenCapture(new Rectangle(data.rectUpperLeftX + data.ScreenBaseX, data.rectUpperLeftY, data.rectWidth, data.rectHeight));
+			image = new Robot().createScreenCapture(new Rectangle(data.rectUpperLeftX + CaptureInfo.ScreenMinX, data.rectUpperLeftY, data.rectWidth, data.rectHeight));
 		} catch (AWTException ex) {
 			StaticLog.error(ex);
 			return;

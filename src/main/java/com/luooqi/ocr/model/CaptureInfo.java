@@ -1,6 +1,7 @@
 
 package com.luooqi.ocr.model;
 
+import cn.hutool.core.swing.ScreenUtil;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -69,12 +70,13 @@ public class CaptureInfo {
 	// ------------
 
 	/** The screen width. */
-	public static int screenWidth = (int)Screen.getPrimary().getBounds().getWidth();
+	public static int ScreenWidth = ScreenUtil.getWidth();
 
 	/** The screen height. */
-	public static int screenHeight = (int)Screen.getPrimary().getBounds().getHeight();
+	public static int ScreenHeight = ScreenUtil.getHeight();
 
-	public static int ScreenBaseX = 0;
+	public static int ScreenMinX = 0;
+	public static int ScreenMaxX = 0;
 
 	public void reset(){
 		mouseXNow = 0;
