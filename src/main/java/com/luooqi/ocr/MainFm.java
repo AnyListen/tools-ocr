@@ -1,6 +1,7 @@
 package com.luooqi.ocr;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.controller.ProcessController;
 import com.luooqi.ocr.model.CaptureInfo;
 import com.luooqi.ocr.model.StageInfo;
@@ -22,10 +23,14 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.jnativehook.GlobalScreen;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -68,6 +73,7 @@ public class MainFm extends Application {
 
         HBox topBar = new HBox(
                 CommUtils.createButton("snapBtn", MainFm::doSnap, "截图"),
+                CommUtils.createButton("openImageBtn", MainFm::recImage, "打开"),
                 CommUtils.createButton("copyBtn", this::copyText, "复制"),
                 CommUtils.createButton("pasteBtn", this::pasteText, "粘贴"),
                 CommUtils.createButton("clearBtn", this::clearText, "清空"),
@@ -145,6 +151,25 @@ public class MainFm extends Application {
         stageInfo = new StageInfo(stage.getX(), stage.getY(),
                 stage.getWidth(), stage.getHeight(), stage.isFullScreen());
         runLater(screenCapture::prepareForCapture);
+    }
+
+    private static void recImage() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Please Select Image File");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg"));
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        if (selectedFile == null || !selectedFile.isFile()) {
+            return;
+        }
+        stageInfo = new StageInfo(stage.getX(), stage.getY(),
+                stage.getWidth(), stage.getHeight(), stage.isFullScreen());
+        MainFm.stage.close();
+        try {
+            BufferedImage image = ImageIO.read(selectedFile);
+            doOcr(image);
+        } catch (IOException e) {
+            StaticLog.error(e);
+        }
     }
 
     public static void cancelSnap() {

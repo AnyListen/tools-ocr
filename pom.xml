@@ -23,7 +23,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>4.5.1</version>
+            <version>4.5.16</version>
         </dependency>
 
         <dependency>
@@ -77,7 +77,7 @@
                 <version>8.8.3</version>
                 <configuration>
                     <mainClass>com.luooqi.ocr.MainFm</mainClass>
-                    <bundler>dmg</bundler>
+                    <bundler>exe</bundler>
                     <jfxAppOutputDir>${project.build.directory}/app</jfxAppOutputDir>
                     <nativeOutputDir>${project.build.directory}/native</nativeOutputDir>
                     <appName>treehole</appName>
@@ -86,6 +86,8 @@
                     <needShortcut>true</needShortcut>
                     <bundleArguments>
                         <runtime />
+                        <copyright>luooqi@2019</copyright>
+                        <installdirChooser>true</installdirChooser>
                     </bundleArguments>
                     <nativeReleaseVersion>${soft.version}</nativeReleaseVersion>
                 </configuration>

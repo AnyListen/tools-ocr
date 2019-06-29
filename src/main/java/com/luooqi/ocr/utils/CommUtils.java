@@ -1,7 +1,5 @@
 package com.luooqi.ocr.utils;
 
-import cn.hutool.core.swing.RobotUtil;
-import cn.hutool.core.swing.ScreenUtil;
 import cn.hutool.core.util.CharUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
@@ -13,9 +11,8 @@ import com.luooqi.ocr.model.TextBlock;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -36,8 +33,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
-import java.util.*;
 import java.util.regex.Pattern;
 
 public class CommUtils {
@@ -96,7 +95,7 @@ public class CommUtils {
         int maxX = -1;
         double maxAngle = -100;
         for (TextBlock textBlock : textBlocks) {
-            System.out.println(textBlock.getAngle()+ "\t" + textBlock.getFontSize());
+            //System.out.println(textBlock.getAngle()+ "\t" + textBlock.getFontSize());
             if (textBlock.getTopLeft().x < minX) {
                 minX = textBlock.getTopLeft().x;
                 minBlock = textBlock;

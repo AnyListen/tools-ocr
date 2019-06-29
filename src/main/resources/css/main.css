@@ -11,6 +11,10 @@
     -fx-background-image: url(/img/screenshot.png);
 }
 
+#openImageBtn{
+    -fx-background-image: url(/img/add-image.png);
+}
+
 #clearBtn{
      -fx-background-image: url(/img/clear.png);
  }
