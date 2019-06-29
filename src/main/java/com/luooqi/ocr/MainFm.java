@@ -182,7 +182,7 @@ public class MainFm extends Application {
         processController.show();
         Thread ocrThread = new Thread(()->{
             byte[] bytes = CommUtils.imageToBytes(image);
-            String text = OcrUtils.sogouWebOcr(bytes);
+            String text = OcrUtils.ocrImg(bytes);
             Platform.runLater(()-> {
                 processController.close();
                 textArea.setText(text);

@@ -1,8 +1,7 @@
 ## 树洞 OCR 文字识别
 一款跨平台的 OCR 小工具
 
-百度网盘：[https://pan.baidu.com/s/1gVVQ58fZ8ori-O7rWKpRPQ](https://pan.baidu.com/s/1gVVQ58fZ8ori-O7rWKpRPQ)
-提取码：m6d8 
+下载地址：[百度网盘](https://pan.baidu.com/s/1gVVQ58fZ8ori-O7rWKpRPQ)  提取码：`m6d8`
 
 > - `xxx-with-jre.xx` 是完整版，带运行环境；如果精简版不能正常工作，请下载完整版使用；
 > - 文字识别使用了各云平台开发的识别接口，因此需要联网才能正常使用；
@@ -38,6 +37,7 @@
   - [x] 识别结果文本对齐（暂未实现多分栏）
   - [x] 全屏模式下截图
   - [x] 添加正在识别动画
+  - [x] 多屏支持
 - [ ] 文本翻译
 - [ ] 公式识别
 - [ ] 表格识别
