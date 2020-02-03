@@ -12,6 +12,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.model.TextBlock;
 
 import java.awt.*;
@@ -26,6 +27,7 @@ public class OcrUtils {
 
     public static String ocrImg(byte[] imgData) {
         int i = Math.abs(UUID.randomUUID().hashCode()) % 4;
+        StaticLog.info("OCR Engine: " + i);
         switch (i){
             case 0:
                 return bdGeneralOcr(imgData);
@@ -77,8 +79,8 @@ public class OcrUtils {
         String url = "https://deepi.sogou.com/api/sogouService";
         String referer = "https://deepi.sogou.com/?from=picsearch&tdsourcetag=s_pctim_aiomsg";
         String imageData = Base64.encode(imgData);
-        long t = new Date().getTime();
-        String sign = SecureUtil.md5("sogou_ocr_just_for_deepibasicOpenOcr" + t + imageData.substring(0, Math.min(1024, imageData.length())) + "7f42cedccd1b3917c87aeb59e08b40ad");
+        long t = System.currentTimeMillis();
+        String sign = SecureUtil.md5("sogou_ocr_just_for_deepibasicOpenOcr" + t + imageData.substring(0, Math.min(1024, imageData.length())) + "4b66a37108dab018ace616c4ae07e644");
         Map<String, Object> data = new HashMap<>();
         data.put("image", imageData);
         data.put("lang", "zh-Chs");
