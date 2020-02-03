@@ -56,6 +56,17 @@ public class MainFm extends Application {
     @Override
     public void start(Stage primaryStage) {
         stage = primaryStage;
+        stageInfo = new StageInfo();
+        stage.xProperty().addListener((observable, oldValue, newValue) -> {
+            if (stage.getX() > 0){
+                stageInfo.setX(stage.getX());
+            }
+        });
+        stage.yProperty().addListener((observable, oldValue, newValue) -> {
+            if (stage.getY() > 0){
+                stageInfo.setY(stage.getY());
+            }
+        });
         screenCapture = new ScreenCapture(stage);
         processController = new ProcessController();
         initKeyHook();
@@ -148,8 +159,9 @@ public class MainFm extends Application {
     }
 
     public static void doSnap() {
-        stageInfo = new StageInfo(stage.getX(), stage.getY(),
-                stage.getWidth(), stage.getHeight(), stage.isFullScreen());
+        stageInfo.setWidth(stage.getWidth());
+        stageInfo.setHeight(stage.getHeight());
+        stageInfo.setFullScreenState(stage.isFullScreen());
         runLater(screenCapture::prepareForCapture);
     }
 

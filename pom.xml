@@ -85,7 +85,7 @@
                     <vendor>com.luooqi</vendor>
                     <needShortcut>true</needShortcut>
                     <bundleArguments>
-                        <runtime />
+                        <!--<runtime />-->
                         <copyright>luooqi@2019</copyright>
                         <installdirChooser>true</installdirChooser>
                     </bundleArguments>

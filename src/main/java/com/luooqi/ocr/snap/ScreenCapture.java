@@ -433,7 +433,11 @@ public class ScreenCapture {
 			stage.setFullScreenExitHint("");
 			stage.setFullScreen(true);
 			stage.setAlwaysOnTop(true);
+			if (stage.isIconified()){
+				stage.setIconified(false);
+			}
 			stage.show();
+			stage.requestFocus();
 		});
 	}
 

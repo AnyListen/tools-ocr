@@ -7,6 +7,8 @@ public class StageInfo {
     private double height;
     private boolean fullScreenState;
 
+    public StageInfo(){}
+
     public StageInfo(double x, double y, double width, double height, boolean fullScreenState) {
         this.x = x;
         this.y = y;
