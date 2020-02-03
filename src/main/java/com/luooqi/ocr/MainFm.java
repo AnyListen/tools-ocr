@@ -9,6 +9,7 @@ import com.luooqi.ocr.snap.ScreenCapture;
 import com.luooqi.ocr.utils.CommUtils;
 import com.luooqi.ocr.utils.GlobalKeyListener;
 import com.luooqi.ocr.utils.OcrUtils;
+import com.luooqi.ocr.utils.VoidDispatchService;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -31,8 +32,12 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.AbstractExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -227,6 +232,7 @@ public class MainFm extends Application {
             Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
             logger.setLevel(Level.WARNING);
             logger.setUseParentHandlers(false);
+            GlobalScreen.setEventDispatcher(new VoidDispatchService());
             GlobalScreen.registerNativeHook();
             GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
         }
