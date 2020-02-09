@@ -9,7 +9,7 @@
     <version>${soft.version}</version>
 
     <properties>
-        <soft.version>1.2.0</soft.version>
+        <soft.version>1.2.1</soft.version>
     </properties>
 
     <dependencies>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>4.5.16</version>
+            <version>5.1.2</version>
         </dependency>
 
         <dependency>
@@ -85,8 +85,8 @@
                     <vendor>com.luooqi</vendor>
                     <needShortcut>true</needShortcut>
                     <bundleArguments>
-                        <!--<runtime />-->
-                        <copyright>luooqi@2019</copyright>
+                        <runtime />
+                        <copyright>luooqi@2020</copyright>
                         <installdirChooser>true</installdirChooser>
                     </bundleArguments>
                     <nativeReleaseVersion>${soft.version}</nativeReleaseVersion>
