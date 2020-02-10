@@ -219,11 +219,11 @@ public class MainFm extends Application {
         stage.setWidth(stageInfo.getWidth());
         stage.setHeight(stageInfo.getHeight());
         if (focus){
-            stage.show();
+            stage.setOpacity(1.0f);
             stage.requestFocus();
         }
         else{
-            stage.close();
+            stage.setOpacity(0.0f);
         }
     }
 

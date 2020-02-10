@@ -401,13 +401,8 @@ public class ScreenCapture {
 
 	public void prepareForCapture() {
 		isSnapping = true;
-		MainFm.stage.close();
+		MainFm.stage.setOpacity(0.0f);
 		Platform.runLater(() -> {
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				StaticLog.error(e);
-			}
 			Rectangle rectangle = CommUtils.snapScreen(MainFm.stage);
 			data.reset();
 			CaptureInfo.ScreenMinX = rectangle.x;
@@ -431,12 +426,12 @@ public class ScreenCapture {
 			repaintCanvas();
 			stage.setScene(scene);
 			stage.setFullScreenExitHint("");
-			stage.setFullScreen(true);
-			stage.setAlwaysOnTop(true);
 			if (stage.isIconified()){
 				stage.setIconified(false);
 			}
-			stage.show();
+			stage.setFullScreen(true);
+			stage.setAlwaysOnTop(true);
+			stage.setOpacity(1.0f);
 			stage.requestFocus();
 		});
 	}

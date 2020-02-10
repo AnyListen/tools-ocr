@@ -9,7 +9,7 @@
     <version>${soft.version}</version>
 
     <properties>
-        <soft.version>1.2.1</soft.version>
+        <soft.version>1.2.2</soft.version>
     </properties>
 
     <dependencies>
@@ -85,7 +85,7 @@
                     <vendor>com.luooqi</vendor>
                     <needShortcut>true</needShortcut>
                     <bundleArguments>
-                        <runtime />
+<!--                        <runtime />-->
                         <copyright>luooqi@2020</copyright>
                         <installdirChooser>true</installdirChooser>
                     </bundleArguments>
