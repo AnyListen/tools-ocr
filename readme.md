@@ -5,11 +5,12 @@
 
 > - `xxx-with-jre.xx` 是完整版，带运行环境；如果精简版不能正常工作，请下载完整版使用；
 > - 文字识别使用了各云平台开发的识别接口，因此需要联网才能正常使用；
+> - **安装路径请勿包含中文字符**；
 > - 本程序使用 JavaFX 开发，使用前请务必安装 **Java8** 运行环境（完整版无需安装 Java8）。
 
-![截图](http://img.luooqi.com/FqzQ_arDyqsYOXcRoFNQ_Hezyoqo)
+![截图](http://img.ifish.fun/FqzQ_arDyqsYOXcRoFNQ_Hezyoqo)
 
-![识别结果](http://img.luooqi.com/FrQngY0WsMZP-f6NBze14n0SSKkB)
+![识别结果](http://img.ifish.fun/FrQngY0WsMZP-f6NBze14n0SSKkB)
 
 ## 程序使用
 ### 启动截图
@@ -30,7 +31,7 @@
 ### MAC权限设置
 由于监控了截图快捷键，因此MAC需要开启相应的权限，请见下图：
 
-![MAC权限设置](http://img.luooqi.com/Fo31NZQIhPNF6m7gOorRGDuKvaZ_)
+![MAC权限设置](http://img.ifish.fun/Fo31NZQIhPNF6m7gOorRGDuKvaZ_)
 
 ## TODO
 - [x] 图片文字识别
