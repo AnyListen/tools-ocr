@@ -9,7 +9,7 @@
     <version>${soft.version}</version>
 
     <properties>
-        <soft.version>1.2.2</soft.version>
+        <soft.version>1.2.5</soft.version>
     </properties>
 
     <dependencies>
@@ -31,6 +31,38 @@
             <artifactId>imgscalr-lib</artifactId>
             <version>4.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.jfoenix</groupId>
+            <artifactId>jfoenix</artifactId>
+            <version>8.0.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.datafx</groupId>
+            <artifactId>datafx</artifactId>
+            <version>8.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.datafx</groupId>
+            <artifactId>flow</artifactId>
+            <version>8.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-fontawesome5-pack</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
+
 
         <dependency>
             <groupId>junit</groupId>
