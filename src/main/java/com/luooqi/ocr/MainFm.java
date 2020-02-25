@@ -14,10 +14,9 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 import javafx.scene.layout.*;
@@ -110,7 +109,16 @@ public class MainFm extends Application {
         textArea.textProperty().addListener((observable, oldValue, newValue) -> statsProperty.set("总字数：" + newValue.replaceAll(CommUtils.SPECIAL_CHARS, "").length()));
         statsLabel.textProperty().bind(statsProperty);
         footerBar.getItems().add(statsLabel);
+
+        Tab tab1 = new Tab("OCR");
+        Tab tab2 = new Tab("Translate");
+        Tab tab3 = new Tab("Math");
+        TabPane tabPane = new TabPane(tab1, tab2, tab3);
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        tabPane.setSide(Side.BOTTOM);
+
         BorderPane root = new BorderPane();
+        root.setLeft(tabPane);
         root.setTop(topBar);
         root.setCenter(textArea);
         root.setBottom(footerBar);
