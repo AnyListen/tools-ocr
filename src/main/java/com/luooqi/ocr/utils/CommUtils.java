@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CommUtils {
@@ -272,8 +273,13 @@ public class CommUtils {
         stage.getIcons().add(new javafx.scene.image.Image(MainFm.class.getResource("/img/logo.png").toExternalForm()));
     }
 
+    private static final Pattern scalePattern = Pattern.compile("renderScale:([\\d.]+)");
+
     public static Rectangle snapScreen(Stage stage){
         double x = stage.getX();
+
+
+
         Screen crtScreen = null;
         for (Screen screen : Screen.getScreens()) {
             crtScreen = screen;
@@ -282,8 +288,16 @@ public class CommUtils {
                 break;
             }
         }
+        float scale = 1.0f;
+        assert crtScreen != null;
+        String str = crtScreen.toString();
+        Matcher matcher = scalePattern.matcher(str);
+        if (matcher.find()){
+            scale = Float.parseFloat(matcher.group(1));
+        }
         Rectangle2D rectangle2D = crtScreen.getBounds();
-        return new Rectangle((int)rectangle2D.getMinX (), (int)rectangle2D.getMinY(), (int) rectangle2D.getWidth(),
-                (int) rectangle2D.getHeight());
+        return new Rectangle((int)rectangle2D.getMinX (), (int)rectangle2D.getMinY(),
+                (int)(rectangle2D.getWidth() * scale),
+                (int)(rectangle2D.getHeight() * scale));
     }
 }
