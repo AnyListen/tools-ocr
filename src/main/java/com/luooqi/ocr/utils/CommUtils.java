@@ -273,31 +273,38 @@ public class CommUtils {
         stage.getIcons().add(new javafx.scene.image.Image(MainFm.class.getResource("/img/logo.png").toExternalForm()));
     }
 
-    private static final Pattern scalePattern = Pattern.compile("renderScale:([\\d.]+)");
+    private static final Pattern SCALE_PATTERN = Pattern.compile("renderScale:([\\d.]+)");
 
-    public static Rectangle snapScreen(Stage stage){
+    public static Rectangle getDisplayScreen(Stage stage){
+        Screen crtScreen = getCrtScreen(stage);
+        Rectangle2D rectangle2D = crtScreen.getBounds();
+        return new Rectangle((int)rectangle2D.getMinX (), (int)rectangle2D.getMinY(),
+                (int)rectangle2D.getWidth(),
+                (int)rectangle2D.getHeight());
+    }
+
+    public static float getScale(Stage stage){
+        Screen crtScreen = getCrtScreen(stage);
+        float scale = 1.0f;
+        assert crtScreen != null;
+        String str = crtScreen.toString();
+        Matcher matcher = SCALE_PATTERN.matcher(str);
+        if (matcher.find()){
+            scale = Float.parseFloat(matcher.group(1));
+        }
+        return scale;
+    }
+
+    private static Screen getCrtScreen(Stage stage) {
         double x = stage.getX();
-
-
-
         Screen crtScreen = null;
         for (Screen screen : Screen.getScreens()) {
             crtScreen = screen;
             Rectangle2D bounds = screen.getBounds();
-            if (bounds.getMaxX() > x){
+            if (bounds.getMaxX() > x) {
                 break;
             }
         }
-        float scale = 1.0f;
-        assert crtScreen != null;
-        String str = crtScreen.toString();
-        Matcher matcher = scalePattern.matcher(str);
-        if (matcher.find()){
-            scale = Float.parseFloat(matcher.group(1));
-        }
-        Rectangle2D rectangle2D = crtScreen.getBounds();
-        return new Rectangle((int)rectangle2D.getMinX (), (int)rectangle2D.getMinY(),
-                (int)(rectangle2D.getWidth() * scale),
-                (int)(rectangle2D.getHeight() * scale));
+        return crtScreen;
     }
 }

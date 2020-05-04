@@ -22,7 +22,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import org.imgscalr.Scalr;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -403,14 +402,14 @@ public class ScreenCapture {
 		isSnapping = true;
 		MainFm.stage.setOpacity(0.0f);
 		Platform.runLater(() -> {
-			Rectangle rectangle = CommUtils.snapScreen(MainFm.stage);
+			Rectangle rectangle = CommUtils.getDisplayScreen(MainFm.stage);
 			data.reset();
 			CaptureInfo.ScreenMinX = rectangle.x;
 			CaptureInfo.ScreenMaxX = rectangle.x + rectangle.width;
 			CaptureInfo.ScreenWidth = rectangle.width;
 			CaptureInfo.ScreenHeight = rectangle.height;
 			BufferedImage bufferedImage = ScreenUtil.captureScreen(rectangle);
-			bufferedImage = Scalr.resize(bufferedImage, Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, CaptureInfo.ScreenWidth * 2, CaptureInfo.ScreenHeight * 2);
+			//bufferedImage = Scalr.resize(bufferedImage, Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, CaptureInfo.ScreenWidth * 2, CaptureInfo.ScreenHeight * 2);
 			WritableImage fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
 			deActivateAllKeys();
 			scene.setRoot(new Pane());

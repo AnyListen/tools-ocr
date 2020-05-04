@@ -9,6 +9,7 @@ import javafx.scene.SnapshotParameters;
 import org.junit.Test;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,6 +31,9 @@ public class OcrUtilsTest {
 
     @Test
     public void sogouWebOcr() {
-
+        GraphicsConfiguration asdf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+        AffineTransform asfd2 = asdf.getDefaultTransform();
+        double scaleX = asfd2.getScaleX();
+        double scaleY = asfd2.getScaleY();
     }
 }
