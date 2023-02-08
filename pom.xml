@@ -9,7 +9,7 @@
     <version>${soft.version}</version>
 
     <properties>
-        <soft.version>1.2.5</soft.version>
+        <soft.version>1.2.6</soft.version>
     </properties>
 
     <dependencies>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>5.1.2</version>
+            <version>5.8.11</version>
         </dependency>
 
         <dependency>
@@ -33,57 +33,15 @@
         </dependency>
 
         <dependency>
-            <groupId>com.jfoenix</groupId>
-            <artifactId>jfoenix</artifactId>
-            <version>8.0.9</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.datafx</groupId>
-            <artifactId>datafx</artifactId>
-            <version>8.0.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.datafx</groupId>
-            <artifactId>flow</artifactId>
-            <version>8.0.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.kordamp.ikonli</groupId>
-            <artifactId>ikonli-javafx</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.kordamp.ikonli</groupId>
-            <artifactId>ikonli-fontawesome5-pack</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-
-
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
 
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -109,7 +67,7 @@
                 <version>8.8.3</version>
                 <configuration>
                     <mainClass>com.luooqi.ocr.MainFm</mainClass>
-                    <bundler>exe</bundler>
+                    <bundler>dmg</bundler>
                     <jfxAppOutputDir>${project.build.directory}/app</jfxAppOutputDir>
                     <nativeOutputDir>${project.build.directory}/native</nativeOutputDir>
                     <appName>treehole</appName>
@@ -122,6 +80,33 @@
                         <installdirChooser>true</installdirChooser>
                     </bundleArguments>
                     <nativeReleaseVersion>${soft.version}</nativeReleaseVersion>
+                    <additionalAppResources>${project.basedir}/ocr/models</additionalAppResources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>testCompile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

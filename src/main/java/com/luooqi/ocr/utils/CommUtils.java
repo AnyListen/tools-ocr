@@ -123,10 +123,6 @@ public class CommUtils {
             lineBlock.add(textBlock);
         }
 
-        if (maxAngle >= 0.05){
-            //todo 文本倾斜校正
-        }
-
         if (lineBlock.size() > 0) {
             lineBlock.sort(Comparator.comparingInt(o -> o.getTopLeft().x));
             lineBlocks.add(lineBlock);
@@ -137,6 +133,9 @@ public class CommUtils {
             TextBlock firstBlock = line.get(0);
             if (lastBlock != null) {
                 String blockTxt = lastBlock.getText().trim();
+                if (StrUtil.isBlank(blockTxt)){
+                    continue;
+                }
                 String endTxt = blockTxt.substring(blockTxt.length() - 1);
                 if (maxX - lastBlock.getTopRight().x >= CHAR_WIDTH * 2 ||
                         !NORMAL_CHAR.matcher(endTxt).find() ||
@@ -295,7 +294,7 @@ public class CommUtils {
         return scale;
     }
 
-    private static Screen getCrtScreen(Stage stage) {
+    public static Screen getCrtScreen(Stage stage) {
         double x = stage.getX();
         Screen crtScreen = null;
         for (Screen screen : Screen.getScreens()) {

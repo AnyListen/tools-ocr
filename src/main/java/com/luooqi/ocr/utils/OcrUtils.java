@@ -1,6 +1,7 @@
 package com.luooqi.ocr.utils;
 
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
@@ -13,9 +14,12 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.StaticLog;
+import com.benjaminwan.ocrlibrary.OcrResult;
+import com.luooqi.ocr.local.LocalOCR;
 import com.luooqi.ocr.model.TextBlock;
 
 import java.awt.*;
+import java.io.File;
 import java.util.*;
 import java.util.List;
 
@@ -24,6 +28,17 @@ import java.util.List;
  * Created by 何志龙 on 2019-03-22.
  */
 public class OcrUtils {
+
+    public static String localOrcImg(byte[] imgData){
+        String path = "tmp_" + Math.abs(Arrays.hashCode(imgData)) +".png";
+        File file = FileUtil.writeBytes(imgData, path);
+        if (file.exists()){
+            OcrResult ocrResult = LocalOCR.INSTANCE.getOcrEngine().detect(file.getAbsolutePath());
+            file.delete();
+            return extractLocalResult(ocrResult);
+        }
+        return "";
+    }
 
     public static String ocrImg(byte[] imgData) {
         int i = Math.abs(UUID.randomUUID().hashCode()) % 4;
@@ -54,8 +69,10 @@ public class OcrUtils {
         for (String url : urlArr) {
             HttpResponse cookieResp = WebUtils.get(url);
             List<String> ckList = cookieResp.headerList("Set-Cookie");
-            for (String s : ckList) {
-                cookie.append(s.replaceAll("expires[\\S\\s]+", ""));
+            if (ckList != null){
+                for (String s : ckList) {
+                    cookie.append(s.replaceAll("expires[\\S\\s]+", ""));
+                }
             }
         }
         HashMap<String, String> header = new HashMap<>();
@@ -147,6 +164,26 @@ public class OcrUtils {
             textBlock.setTopRight(new Point(top, left + width));
             textBlock.setBottomLeft(new Point(top + height, left));
             textBlock.setBottomRight(new Point(top + height, left + width));
+            textBlocks.add(textBlock);
+        }
+        return CommUtils.combineTextBlocks(textBlocks, isEng);
+    }
+
+
+    private static String extractLocalResult(OcrResult ocrResult) {
+        if (ocrResult == null) {
+            return "";
+        }
+        ArrayList<com.benjaminwan.ocrlibrary.TextBlock> blocks = ocrResult.getTextBlocks();
+        List<TextBlock> textBlocks = new ArrayList<>();
+        boolean isEng = false;
+        for (com.benjaminwan.ocrlibrary.TextBlock block : blocks) {
+            TextBlock textBlock = new TextBlock();
+            textBlock.setText(block.getText());
+            textBlock.setTopLeft(new Point(block.getBoxPoint().get(0).getX(), block.getBoxPoint().get(0).getY()));
+            textBlock.setTopRight(new Point(block.getBoxPoint().get(1).getX(), block.getBoxPoint().get(1).getY()));
+            textBlock.setBottomLeft(new Point(block.getBoxPoint().get(2).getX(), block.getBoxPoint().get(2).getY()));
+            textBlock.setBottomRight(new Point(block.getBoxPoint().get(3).getX(), block.getBoxPoint().get(3).getY()));
             textBlocks.add(textBlock);
         }
         return CommUtils.combineTextBlocks(textBlocks, isEng);

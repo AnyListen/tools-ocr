@@ -1,5 +1,6 @@
 package com.luooqi.ocr;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.controller.ProcessController;
@@ -32,12 +33,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.AbstractExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,6 +59,12 @@ public class MainFm extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        try {
+            File file = FileUtil.writeString("1", "tmp_111.txt", Charset.defaultCharset());
+            MainFm.addLibraryDir(file.getParent());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         stage = primaryStage;
         stageInfo = new StageInfo();
         stage.xProperty().addListener((observable, oldValue, newValue) -> {
@@ -199,7 +204,7 @@ public class MainFm extends Application {
         processController.show();
         Thread ocrThread = new Thread(()->{
             byte[] bytes = CommUtils.imageToBytes(image);
-            String text = OcrUtils.ocrImg(bytes);
+            String text = OcrUtils.localOrcImg(bytes);
             Platform.runLater(()-> {
                 processController.close();
                 textArea.setText(text);
@@ -239,5 +244,25 @@ public class MainFm extends Application {
         catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private static void addLibraryDir(String libraryPath) throws Exception {
+        Field userPathsField = ClassLoader.class.getDeclaredField("usr_paths");
+        userPathsField.setAccessible(true);
+        String[] paths = (String[]) userPathsField.get(null);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < paths.length; i++) {
+            if (libraryPath.equals(paths[i])) {
+                continue;
+            }
+            sb.append(paths[i]).append(';');
+        }
+        sb.append(libraryPath);
+        //修改java.library.path
+        System.setProperty("java.library.path", sb.toString());
+        final Field sysPathsField = ClassLoader.class.getDeclaredField("sys_paths");
+        sysPathsField.setAccessible(true);
+        //修改完成后重新将sys_paths置为null
+        sysPathsField.set(null, null);
     }
 }

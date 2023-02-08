@@ -21,6 +21,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.awt.*;
@@ -33,18 +34,18 @@ import java.awt.image.BufferedImage;
  */
 public class ScreenCapture {
 
-	private BorderPane rootPane;
-	private Canvas mainCanvas;
-	private CaptureInfo data;
+	private final BorderPane rootPane;
+	private final Canvas mainCanvas;
+	private final CaptureInfo data;
 	private GraphicsContext gc;
 	private Scene scene;
-	private Stage stage;
+	private final Stage stage;
 	public static boolean isSnapping = false;
 
 	/**
 	 * When a key is being pressed into the capture window then this Animation Timer is doing it's magic.
 	 */
-	private AnimationTimer yPressedAnimation = new AnimationTimer() {
+	private final AnimationTimer yPressedAnimation = new AnimationTimer() {
 		private long nextSecond = 0L;
 		private long precisionLevel;
 
@@ -440,7 +441,7 @@ public class ScreenCapture {
 		BufferedImage image;
 		try {
 			mainCanvas.setDisable(true);
-			image = new Robot().createScreenCapture(new Rectangle(data.rectUpperLeftX + CaptureInfo.ScreenMinX, data.rectUpperLeftY, data.rectWidth, data.rectHeight));
+			image = new Robot().createScreenCapture(new Rectangle(data.rectUpperLeftX + CaptureInfo.ScreenMinX, data.rectUpperLeftY + (int)CommUtils.getCrtScreen(stage).getVisualBounds().getMinY(), data.rectWidth, data.rectHeight));
 		} catch (AWTException ex) {
 			StaticLog.error(ex);
 			return;
