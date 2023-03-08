@@ -41,18 +41,35 @@ public class OcrUtils {
     }
 
     public static String ocrImg(byte[] imgData) {
-        int i = Math.abs(UUID.randomUUID().hashCode()) % 4;
-        StaticLog.info("OCR Engine: " + i);
-        switch (i){
-            case 0:
-                return bdGeneralOcr(imgData);
-            case 1:
-                return bdAccurateOcr(imgData);
-            case 2:
-                return sogouMobileOcr(imgData);
-            default:
-                return sogouWebOcr(imgData);
+        List<Integer> lst = Arrays.asList(0, 1, 2, 3);
+        Collections.shuffle(lst);  // order randomly
+        String ret = null;
+        for (int i : lst) {
+            StaticLog.info("OCR Engine: " + i);
+            try {
+                switch (i){
+                    case 0:
+                        ret = bdGeneralOcr(imgData);
+                        break;
+                    case 1:
+                        ret = bdAccurateOcr(imgData);
+                        break;
+                    case 2:
+                        ret = sogouMobileOcr(imgData);
+                        break;
+                    case 3:
+                        ret = sogouWebOcr(imgData);
+                        break;
+                }
+                if (ret != null && ret.length() > 0) {
+                    break;  // break the for-loop
+                }
+            } catch (Exception exc) {
+                StaticLog.warn(exc.toString());
+                StaticLog.warn("error encounterd, will try another OCR Engine");
+            }
         }
+        return ret;
     }
 
     private static String bdGeneralOcr(byte[] imgData){
