@@ -33,6 +33,19 @@
     </dependency>
 
     <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.4.7</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.20</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.13.2</version>
@@ -67,11 +80,7 @@
         <version>8.8.3</version>
         <configuration>
           <mainClass>com.luooqi.ocr.MainFm</mainClass>
-          <bundler>dmg</bundler>
-          <jfxAppOutputDir>${project.build.directory}/app</jfxAppOutputDir>
-          <nativeOutputDir>${project.build.directory}/native</nativeOutputDir>
           <appName>treehole</appName>
-          <verbose>true</verbose>
           <vendor>com.luooqi</vendor>
           <needShortcut>true</needShortcut>
           <bundleArguments>

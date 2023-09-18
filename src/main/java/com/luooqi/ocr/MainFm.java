@@ -204,10 +204,17 @@ public class MainFm extends Application {
     processController.show();
     Thread ocrThread = new Thread(() -> {
       byte[] bytes = CommUtils.imageToBytes(image);
-      String text = OcrUtils.localOrcImg(bytes);
+      String text = null;
+      try {
+        text = OcrUtils.localOrcImg(bytes);
+      } catch (Exception e) {
+        text = e.getMessage();
+      }
+
+      String finalText = text;
       Platform.runLater(() -> {
         processController.close();
-        textArea.setText(text);
+        textArea.setText(finalText);
         restore(true);
       });
     });
