@@ -1,5 +1,10 @@
 package com.luooqi.ocr.utils;
 
+import ai.djl.MalformedModelException;
+import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.output.DetectedObjects;
+import ai.djl.repository.zoo.ModelNotFoundException;
+import ai.djl.translate.TranslateException;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
@@ -14,12 +19,15 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.StaticLog;
+import com.benjaminwan.ocrlibrary.OcrEngine;
 import com.benjaminwan.ocrlibrary.OcrResult;
+import com.litongjava.ai.server.service.PaddleOcrService;
 import com.luooqi.ocr.local.LocalOCR;
 import com.luooqi.ocr.model.TextBlock;
 
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -28,16 +36,31 @@ import java.util.List;
  * Created by 何志龙 on 2019-03-22.
  */
 public class OcrUtils {
+  private static PaddleOcrService paddleOcrService = new PaddleOcrService();
 
-  public static String localOrcImg(byte[] imgData) {
+  public static String recImgLocal(byte[] imgData) throws MalformedModelException, ModelNotFoundException, TranslateException, IOException {
     String path = "tmp_" + Math.abs(Arrays.hashCode(imgData)) + ".png";
     File file = FileUtil.writeBytes(imgData, path);
     if (file.exists()) {
-      OcrResult ocrResult = LocalOCR.INSTANCE.getOcrEngine().detect(file.getAbsolutePath());
+      //OcrEngine ocrEngine = LocalOCR.INSTANCE.getOcrEngine();
+      //OcrResult ocrResult = ocrEngine.detect(file.getAbsolutePath());
+      DetectedObjects index = paddleOcrService.index(file);
       file.delete();
-      return extractLocalResult(ocrResult);
+      //return extractLocalResult(ocrResult);
+      return extractDetectedObjects(index);
     }
     return "";
+  }
+
+  private static String extractDetectedObjects(DetectedObjects objects) {
+    StringBuilder stringBuilder = new StringBuilder();
+    List<Classifications.Classification> items = objects.items();
+    for (int i = 0; i < items.size(); i++) {
+      Classifications.Classification classification = items.get(i);
+      String className = classification.getClassName();
+      stringBuilder.append(className + "\r\n");
+    }
+    return stringBuilder.toString();
   }
 
   public static String ocrImg(byte[] imgData) {

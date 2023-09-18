@@ -206,7 +206,7 @@ public class MainFm extends Application {
       byte[] bytes = CommUtils.imageToBytes(image);
       String text = null;
       try {
-        text = OcrUtils.localOrcImg(bytes);
+        text = OcrUtils.recImgLocal(bytes);
       } catch (Exception e) {
         text = e.getMessage();
       }

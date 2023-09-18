@@ -35,7 +35,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.4.7</version>
+      <version>1.2.3</version>
     </dependency>
 
     <dependency>
@@ -43,6 +43,24 @@
       <artifactId>lombok</artifactId>
       <version>1.18.20</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>ai.djl</groupId>
+      <artifactId>api</artifactId>
+      <version>0.21.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ai.djl.pytorch</groupId>
+      <artifactId>pytorch-engine</artifactId>
+      <version>0.21.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ai.djl.paddlepaddle</groupId>
+      <artifactId>paddlepaddle-model-zoo</artifactId>
+      <version>0.21.0</version>
     </dependency>
 
     <dependency>
