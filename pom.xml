@@ -51,17 +51,21 @@
       <version>0.21.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>ai.djl.pytorch</groupId>
-      <artifactId>pytorch-engine</artifactId>
-      <version>0.21.0</version>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>ai.djl.pytorch</groupId>-->
+<!--      <artifactId>pytorch-engine</artifactId>-->
+<!--      <version>0.21.0</version>-->
+<!--    </dependency>-->
 
     <dependency>
       <groupId>ai.djl.paddlepaddle</groupId>
       <artifactId>paddlepaddle-model-zoo</artifactId>
       <version>0.21.0</version>
     </dependency>
+
+
+
+
 
     <dependency>
       <groupId>junit</groupId>

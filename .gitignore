@@ -149,3 +149,4 @@ __pycache__/
 cmake-build-debug/
 cmake-build-debug-mingw/
 venv/
+.idea/
