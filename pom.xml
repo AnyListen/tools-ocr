@@ -91,7 +91,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>8.8.3</version>
         <configuration>
-          <mainClass>com.luooqi.ocr.MainForm</mainClass>
+          <mainClass>${main.class}</mainClass>
           <appName>treehole</appName>
           <vendor>com.luooqi</vendor>
           <needShortcut>true</needShortcut>
