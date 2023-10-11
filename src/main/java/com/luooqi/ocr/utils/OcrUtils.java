@@ -19,8 +19,11 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.StaticLog;
+import com.benjaminwan.ocrlibrary.OcrEngine;
 import com.benjaminwan.ocrlibrary.OcrResult;
 import com.litongjava.ai.server.service.PaddleOcrService;
+import com.litongjava.jfinal.aop.Aop;
+import com.luooqi.ocr.local.LocalOCR;
 import com.luooqi.ocr.model.TextBlock;
 
 import java.awt.*;
@@ -34,14 +37,16 @@ import java.util.List;
  * Created by 何志龙 on 2019-03-22.
  */
 public class OcrUtils {
-  private static PaddleOcrService paddleOcrService = new PaddleOcrService();
+
+  private static PaddleOcrService paddleOcrService = Aop.get(PaddleOcrService.class);
 
   public static String recImgLocal(byte[] imgData) throws MalformedModelException, ModelNotFoundException, TranslateException, IOException {
     String path = "tmp_" + Math.abs(Arrays.hashCode(imgData)) + ".png";
     File file = FileUtil.writeBytes(imgData, path);
     if (file.exists()) {
-      //OcrEngine ocrEngine = LocalOCR.INSTANCE.getOcrEngine();
-      //OcrResult ocrResult = ocrEngine.detect(file.getAbsolutePath());
+      OcrEngine ocrEngine = LocalOCR.INSTANCE.getOcrEngine();
+      OcrResult ocrResult = ocrEngine.detect(file.getAbsolutePath());
+
       DetectedObjects index = paddleOcrService.index(file);
       file.delete();
       //return extractLocalResult(ocrResult);
@@ -64,9 +69,11 @@ public class OcrUtils {
     for (int i = 0; i < items.size(); i++) {
       Classifications.Classification classification = items.get(i);
       String className = classification.getClassName();
-      stringBuilder.append(className + "\r\n");
+      stringBuilder.append(className+" ");
     }
-    return stringBuilder.toString();
+
+    return objects.toJson();
+    //return stringBuilder.toString();
   }
 
   public static String ocrImg(byte[] imgData) {

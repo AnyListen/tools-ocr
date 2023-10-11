@@ -26,11 +26,10 @@ import com.litongjava.jfinal.aop.Aop;
 public class PaddleOcrService {
 
   private static String clsModelUrls = ModelUrls.clsV2;
-  private static String recModelUrls = ModelUrls.recV4Server;
+
 
 
   Predictor<Image, Classifications> rotateClassifier;
-  Predictor<Image, String> recognizer;
 
   public PaddleOcrService() {
     if (rotateClassifier == null) {
@@ -44,17 +43,7 @@ public class PaddleOcrService {
         e.printStackTrace();
       }
     }
-    if (recognizer == null) {
-      try {
-        recognizer = getRecognizer();
-      } catch (IOException e) {
-        e.printStackTrace();
-      } catch (ModelNotFoundException e) {
-        e.printStackTrace();
-      } catch (MalformedModelException e) {
-        e.printStackTrace();
-      }
-    }
+
   }
 
   public DetectedObjects index(String url)
@@ -85,9 +74,7 @@ public class PaddleOcrService {
     if (rotateClassifier == null) {
       rotateClassifier = getRotater();
     }
-    if (recognizer == null) {
-      recognizer = getRecognizer();
-    }
+
 
     OcrDetector ocrDetector = Aop.get(OcrDetector.class);
     // 检测图片
@@ -108,7 +95,8 @@ public class PaddleOcrService {
       if ("Rotate".equals(result.getClassName()) && result.getProbability() > 0.8) {
         subImg = rotateImg(subImg);
       }
-      String name = recognizer.predict(subImg);
+      OcrRecognizer ocrRecognizer = Aop.get(OcrRecognizer.class);
+      String name = ocrRecognizer.getRecognizer().predict(subImg);
       names.add(name);
       prob.add(-1.0);
       rect.add(boxes.get(i).getBoundingBox());
@@ -117,19 +105,7 @@ public class PaddleOcrService {
     return new DetectedObjects(names, prob, rect);
   }
 
-  private Predictor<Image, String> getRecognizer() throws IOException, ModelNotFoundException, MalformedModelException {
-    Criteria<Image, String> criteria3 = Criteria.builder()
-      //
-      .optEngine("PaddlePaddle").setTypes(Image.class, String.class)
-      //
-      .optModelUrls(recModelUrls)
-      //
-      .optTranslator(new PpWordRecognitionTranslator()).build();
-    ZooModel<Image, String> recognitionModel = criteria3.loadModel();
-    // 识别器
-    Predictor<Image, String> recognizer = recognitionModel.newPredictor();
-    return recognizer;
-  }
+
 
   private Predictor<Image, Classifications> getRotater()
     throws IOException, ModelNotFoundException, MalformedModelException {

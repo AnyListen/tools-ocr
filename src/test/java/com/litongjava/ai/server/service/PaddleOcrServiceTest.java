@@ -15,7 +15,7 @@ public class PaddleOcrServiceTest {
 
   @Test
   public void index() {
-    String filePath="D:\\images\\image.png";
+    String filePath="D:\\images\\three_row.png";
     PaddleOcrService paddleOcrService=new PaddleOcrService();
     try {
       DetectedObjects index = paddleOcrService.index(new File(filePath));

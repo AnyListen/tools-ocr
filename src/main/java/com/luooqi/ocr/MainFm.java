@@ -236,7 +236,7 @@ public class MainFm extends Application {
         text = e.getMessage();
         e.printStackTrace();
       }
-      log.info("识别结果:{}", text);
+      //log.info("识别结果:{}", text);
 
       String finalText = text;
       Platform.runLater(() -> {
@@ -265,6 +265,4 @@ public class MainFm extends Application {
       stage.setOpacity(0.0f);
     }
   }
-
-
 }

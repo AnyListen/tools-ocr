@@ -23,13 +23,18 @@ public class OcrDetectorTest {
 
   @Test
   public void getDetector() throws IOException, TranslateException {
-    String filePath = "D:\\images\\image.png";
+//    String filePath = "D:\\images\\three_row.png";
+    String filePath = "D:\\images\\one_row.png";
     Path file = Paths.get(filePath);
 
     Image src = ImageFactory.getInstance().fromFile(file);
     OcrDetector ocrDetector = Aop.get(OcrDetector.class);
     // 检测图片
-    DetectedObjects detectedObj = ocrDetector.getDetector().predict(src);
-    List<DetectedObjects.DetectedObject> boxes = detectedObj.items();
+    DetectedObjects detectedObjects = ocrDetector.getDetector().predict(src);
+    int numberOfObjects = detectedObjects.getNumberOfObjects();
+    System.out.println(numberOfObjects);
+    String s = detectedObjects.toJson();
+    System.out.println(s);
+
   }
 }
