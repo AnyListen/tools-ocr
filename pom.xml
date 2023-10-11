@@ -50,24 +50,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>ai.djl</groupId>
-      <artifactId>api</artifactId>
-      <version>0.23.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ai.djl.pytorch</groupId>
-      <artifactId>pytorch-engine</artifactId>
-      <version>0.23.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ai.djl.paddlepaddle</groupId>
-      <artifactId>paddlepaddle-model-zoo</artifactId>
-      <version>0.23.0</version>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/com.litongjava/jfinal-aop -->
     <dependency>
       <groupId>com.litongjava</groupId>

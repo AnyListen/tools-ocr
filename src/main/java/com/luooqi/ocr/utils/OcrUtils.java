@@ -1,10 +1,5 @@
 package com.luooqi.ocr.utils;
 
-import ai.djl.MalformedModelException;
-import ai.djl.modality.Classifications;
-import ai.djl.modality.cv.output.DetectedObjects;
-import ai.djl.repository.zoo.ModelNotFoundException;
-import ai.djl.translate.TranslateException;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
@@ -21,16 +16,13 @@ import cn.hutool.json.JSONUtil;
 import cn.hutool.log.StaticLog;
 import com.benjaminwan.ocrlibrary.OcrEngine;
 import com.benjaminwan.ocrlibrary.OcrResult;
-import com.litongjava.ai.server.service.PaddleOcrService;
-import com.litongjava.jfinal.aop.Aop;
 import com.luooqi.ocr.local.LocalOCR;
 import com.luooqi.ocr.model.TextBlock;
 
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * tools-ocr
@@ -38,43 +30,28 @@ import java.util.List;
  */
 public class OcrUtils {
 
-  private static PaddleOcrService paddleOcrService = Aop.get(PaddleOcrService.class);
 
-  public static String recImgLocal(byte[] imgData) throws MalformedModelException, ModelNotFoundException, TranslateException, IOException {
+  public static String recImgLocal(byte[] imgData) {
     String path = "tmp_" + Math.abs(Arrays.hashCode(imgData)) + ".png";
     File file = FileUtil.writeBytes(imgData, path);
     if (file.exists()) {
       OcrEngine ocrEngine = LocalOCR.INSTANCE.getOcrEngine();
       OcrResult ocrResult = ocrEngine.detect(file.getAbsolutePath());
-
-      DetectedObjects index = paddleOcrService.index(file);
       file.delete();
-      //return extractLocalResult(ocrResult);
-      return extractDetectedObjects(index);
+      return extractLocalResult(ocrResult);
     }
     return "";
   }
 
-  public static String recImgLocal(File file) throws MalformedModelException, ModelNotFoundException, TranslateException, IOException {
+  public static String recImgLocal(File file) {
     if (file.exists()) {
-      DetectedObjects index = paddleOcrService.index(file);
-      return extractDetectedObjects(index);
+      OcrEngine ocrEngine = LocalOCR.INSTANCE.getOcrEngine();
+      OcrResult ocrResult = ocrEngine.detect(file.getAbsolutePath());
+      return extractLocalResult(ocrResult);
     }
     return "文件不存在";
   }
 
-  private static String extractDetectedObjects(DetectedObjects objects) {
-    StringBuilder stringBuilder = new StringBuilder();
-    List<Classifications.Classification> items = objects.items();
-    for (int i = 0; i < items.size(); i++) {
-      Classifications.Classification classification = items.get(i);
-      String className = classification.getClassName();
-      stringBuilder.append(className+" ");
-    }
-
-    return objects.toJson();
-    //return stringBuilder.toString();
-  }
 
   public static String ocrImg(byte[] imgData) {
     int i = Math.abs(UUID.randomUUID().hashCode()) % 4;

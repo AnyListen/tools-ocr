@@ -1,7 +1,5 @@
 package com.luooqi.ocr.config;
 
-import com.litongjava.ai.server.service.PaddleOcrService;
-import com.litongjava.jfinal.aop.Aop;
 import com.luooqi.ocr.utils.GlobalKeyListener;
 import com.luooqi.ocr.utils.VoidDispatchService;
 import org.jnativehook.GlobalScreen;
@@ -13,9 +11,6 @@ import java.util.logging.Logger;
  * Created by litonglinux@qq.com on 10/11/2023_12:53 AM
  */
 public class InitConfig {
-  public static void after() {
-    Aop.get(PaddleOcrService.class);
-  }
 
   public static void initKeyHook() {
     try {
