@@ -3,14 +3,13 @@ package com.luooqi.ocr;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
+import com.luooqi.ocr.config.InitConfig;
 import com.luooqi.ocr.controller.ProcessController;
 import com.luooqi.ocr.model.CaptureInfo;
 import com.luooqi.ocr.model.StageInfo;
 import com.luooqi.ocr.snap.ScreenCapture;
 import com.luooqi.ocr.utils.CommUtils;
-import com.luooqi.ocr.utils.GlobalKeyListener;
 import com.luooqi.ocr.utils.OcrUtils;
-import com.luooqi.ocr.utils.VoidDispatchService;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -27,21 +26,19 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import org.jnativehook.GlobalScreen;
+import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static javafx.application.Platform.runLater;
 
+@Slf4j
 public class MainFm extends Application {
 
   public static void main(String[] args) {
@@ -59,27 +56,12 @@ public class MainFm extends Application {
 
   @Override
   public void start(Stage primaryStage) {
-    try {
-      File file = FileUtil.writeString("1", "tmp_111.txt", Charset.defaultCharset());
-      MainFm.addLibraryDir(file.getParent());
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    log.info("primaryStage:{}", primaryStage);
     stage = primaryStage;
-    stageInfo = new StageInfo();
-    stage.xProperty().addListener((observable, oldValue, newValue) -> {
-      if (stage.getX() > 0) {
-        stageInfo.setX(stage.getX());
-      }
-    });
-    stage.yProperty().addListener((observable, oldValue, newValue) -> {
-      if (stage.getY() > 0) {
-        stageInfo.setY(stage.getY());
-      }
-    });
+    setAutoResize();
     screenCapture = new ScreenCapture(stage);
     processController = new ProcessController();
-    initKeyHook();
+    InitConfig.initKeyHook();
 
 //        ToggleGroup segmentGrp = new ToggleGroup();
 //        ToggleButton resetBtn = CommUtils.createToggleButton(segmentGrp, "resetBtn", this::resetText, "重置");
@@ -93,8 +75,8 @@ public class MainFm extends Application {
 //        });
 
     HBox topBar = new HBox(
-      CommUtils.createButton("snapBtn", MainFm::doSnap, "截图"),
-      CommUtils.createButton("openImageBtn", MainFm::recImage, "打开"),
+      CommUtils.createButton("snapBtn", MainFm::screenShotOcr, "截图"),
+      CommUtils.createButton("openImageBtn", MainFm::openImageOcr, "打开"),
       CommUtils.createButton("copyBtn", this::copyText, "复制"),
       CommUtils.createButton("pasteBtn", this::pasteText, "粘贴"),
       CommUtils.createButton("clearBtn", this::clearText, "清空"),
@@ -130,6 +112,21 @@ public class MainFm extends Application {
     mainScene = new Scene(root, 670, 470);
     stage.setScene(mainScene);
     stage.show();
+//    InitConfig.after();
+  }
+
+  private void setAutoResize() {
+    stageInfo = new StageInfo();
+    stage.xProperty().addListener((observable, oldValue, newValue) -> {
+      if (stage.getX() > 0) {
+        stageInfo.setX(stage.getX());
+      }
+    });
+    stage.yProperty().addListener((observable, oldValue, newValue) -> {
+      if (stage.getY() > 0) {
+        stageInfo.setY(stage.getY());
+      }
+    });
   }
 
   private void wrapText() {
@@ -168,14 +165,17 @@ public class MainFm extends Application {
     Clipboard.getSystemClipboard().setContent(data);
   }
 
-  public static void doSnap() {
+  public static void screenShotOcr() {
     stageInfo.setWidth(stage.getWidth());
     stageInfo.setHeight(stage.getHeight());
     stageInfo.setFullScreenState(stage.isFullScreen());
     runLater(screenCapture::prepareForCapture);
   }
 
-  private static void recImage() {
+  /**
+   * 打开图片
+   */
+  private static void openImageOcr() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Please Select Image File");
     fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg"));
@@ -187,12 +187,13 @@ public class MainFm extends Application {
       stage.getWidth(), stage.getHeight(), stage.isFullScreen());
     MainFm.stage.close();
     try {
-      BufferedImage image = ImageIO.read(selectedFile);
-      doOcr(image);
-    } catch (IOException e) {
+      //BufferedImage image = ImageIO.read(selectedFile);
+      doOcr(selectedFile);
+    } catch (Exception e) {
       StaticLog.error(e);
     }
   }
+
 
   public static void cancelSnap() {
     runLater(screenCapture::cancelSnap);
@@ -222,6 +223,33 @@ public class MainFm extends Application {
     ocrThread.start();
   }
 
+  public static void doOcr(File selectedFile) {
+    org.slf4j.Logger log = LoggerFactory.getLogger(MainFm.class);
+    processController.setX(CaptureInfo.ScreenMinX + (CaptureInfo.ScreenWidth - 300) / 2);
+    processController.setY(250);
+    processController.show();
+    Thread ocrThread = new Thread(() -> {
+      String text = null;
+      try {
+        text = OcrUtils.recImgLocal(selectedFile);
+      } catch (Exception e) {
+        text = e.getMessage();
+        e.printStackTrace();
+      }
+      log.info("识别结果:{}", text);
+
+      String finalText = text;
+      Platform.runLater(() -> {
+        processController.close();
+        textArea.setText(finalText);
+
+        restore(true);
+      });
+    });
+    ocrThread.setDaemon(false);
+    ocrThread.start();
+  }
+
   public static void restore(boolean focus) {
     stage.setAlwaysOnTop(false);
     stage.setScene(mainScene);
@@ -238,36 +266,5 @@ public class MainFm extends Application {
     }
   }
 
-  private static void initKeyHook() {
-    try {
-      Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
-      logger.setLevel(Level.WARNING);
-      logger.setUseParentHandlers(false);
-      GlobalScreen.setEventDispatcher(new VoidDispatchService());
-      GlobalScreen.registerNativeHook();
-      GlobalScreen.addNativeKeyListener(new GlobalKeyListener());
-    } catch (Exception ex) {
-      ex.printStackTrace();
-    }
-  }
 
-  private static void addLibraryDir(String libraryPath) throws Exception {
-    Field userPathsField = ClassLoader.class.getDeclaredField("usr_paths");
-    userPathsField.setAccessible(true);
-    String[] paths = (String[]) userPathsField.get(null);
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < paths.length; i++) {
-      if (libraryPath.equals(paths[i])) {
-        continue;
-      }
-      sb.append(paths[i]).append(';');
-    }
-    sb.append(libraryPath);
-    //修改java.library.path
-    System.setProperty("java.library.path", sb.toString());
-    final Field sysPathsField = ClassLoader.class.getDeclaredField("sys_paths");
-    sysPathsField.setAccessible(true);
-    //修改完成后重新将sys_paths置为null
-    sysPathsField.set(null, null);
-  }
 }

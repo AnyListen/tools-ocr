@@ -3,7 +3,6 @@ package com.litongjava.ai.server.service;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
@@ -17,28 +16,49 @@ import ai.djl.modality.cv.util.NDImageUtils;
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
 import ai.djl.paddlepaddle.zoo.cv.imageclassification.PpWordRotateTranslator;
-import ai.djl.paddlepaddle.zoo.cv.objectdetection.PpWordDetectionTranslator;
 import ai.djl.paddlepaddle.zoo.cv.wordrecognition.PpWordRecognitionTranslator;
 import ai.djl.repository.zoo.Criteria;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ZooModel;
 import ai.djl.translate.TranslateException;
+import com.litongjava.jfinal.aop.Aop;
 
 public class PaddleOcrService {
-  private static String detModelUrls = "https://resources.djl.ai/test-models/paddleOCR/mobile/det_db.zip";
-  private static String clsModelUrls = "https://resources.djl.ai/test-models/paddleOCR/mobile/cls.zip";
-  private static String recModelUrls = "https://resources.djl.ai/test-models/paddleOCR/mobile/rec_crnn.zip";
 
-//  private String detModelUrls = "https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_det_infer.tar";
-//  private String clsModelUrls = "https://paddleocr.bj.bcebos.com/dygraph_v2.0/ch/ch_ppocr_mobile_v2.0_cls_infer.tar";
-//  private String recModelUrls = "https://paddleocr.bj.bcebos.com/PP-OCRv3/chinese/ch_PP-OCRv3_rec_infer.tar";
+  private static String clsModelUrls = ModelUrls.clsV2;
+  private static String recModelUrls = ModelUrls.recV4Server;
 
-  Predictor<Image, DetectedObjects> detector;
+
   Predictor<Image, Classifications> rotateClassifier;
   Predictor<Image, String> recognizer;
 
+  public PaddleOcrService() {
+    if (rotateClassifier == null) {
+      try {
+        rotateClassifier = getRotater();
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (ModelNotFoundException e) {
+        e.printStackTrace();
+      } catch (MalformedModelException e) {
+        e.printStackTrace();
+      }
+    }
+    if (recognizer == null) {
+      try {
+        recognizer = getRecognizer();
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (ModelNotFoundException e) {
+        e.printStackTrace();
+      } catch (MalformedModelException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
   public DetectedObjects index(String url)
-      throws IOException, ModelNotFoundException, MalformedModelException, TranslateException {
+    throws IOException, ModelNotFoundException, MalformedModelException, TranslateException {
     // src phooto
     // String url = "https://resources.djl.ai/images/flight_ticket.jpg";
     Image src = ImageFactory.getInstance().fromUrl(url);
@@ -46,11 +66,12 @@ public class PaddleOcrService {
   }
 
   public DetectedObjects index(File file)
-      throws IOException, ModelNotFoundException, MalformedModelException, TranslateException {
+    throws IOException, ModelNotFoundException, MalformedModelException, TranslateException {
     @SuppressWarnings("deprecation")
     Image src = ImageFactory.getInstance().fromUrl(file.toURL());
     return index(src);
   }
+
   public DetectedObjects index(byte[] fileData) throws IOException, TranslateException, ModelNotFoundException, MalformedModelException {
     ByteArrayInputStream is = new ByteArrayInputStream(fileData);
     Image src = ImageFactory.getInstance().fromInputStream(is);
@@ -59,10 +80,8 @@ public class PaddleOcrService {
 
   public DetectedObjects index(Image src)
 
-      throws TranslateException, ModelNotFoundException, MalformedModelException, IOException {
-    if (detector == null) {
-      detector = getDetector();
-    }
+    throws TranslateException, ModelNotFoundException, MalformedModelException, IOException {
+
     if (rotateClassifier == null) {
       rotateClassifier = getRotater();
     }
@@ -70,8 +89,9 @@ public class PaddleOcrService {
       recognizer = getRecognizer();
     }
 
+    OcrDetector ocrDetector = Aop.get(OcrDetector.class);
     // 检测图片
-    DetectedObjects detectedObj = detector.predict(src);
+    DetectedObjects detectedObj = ocrDetector.getDetector().predict(src);
     List<DetectedObjects.DetectedObject> boxes = detectedObj.items();
 
     // 获取所有项
@@ -99,12 +119,12 @@ public class PaddleOcrService {
 
   private Predictor<Image, String> getRecognizer() throws IOException, ModelNotFoundException, MalformedModelException {
     Criteria<Image, String> criteria3 = Criteria.builder()
-        //
-        .optEngine("PaddlePaddle").setTypes(Image.class, String.class)
-        //
-        .optModelUrls(recModelUrls)
-        //
-        .optTranslator(new PpWordRecognitionTranslator()).build();
+      //
+      .optEngine("PaddlePaddle").setTypes(Image.class, String.class)
+      //
+      .optModelUrls(recModelUrls)
+      //
+      .optTranslator(new PpWordRecognitionTranslator()).build();
     ZooModel<Image, String> recognitionModel = criteria3.loadModel();
     // 识别器
     Predictor<Image, String> recognizer = recognitionModel.newPredictor();
@@ -112,40 +132,24 @@ public class PaddleOcrService {
   }
 
   private Predictor<Image, Classifications> getRotater()
-      throws IOException, ModelNotFoundException, MalformedModelException {
+    throws IOException, ModelNotFoundException, MalformedModelException {
 
     Criteria<Image, Classifications> criteria2 = Criteria.builder()
-        //
-        .optEngine("PaddlePaddle")
-        //
-        .setTypes(Image.class, Classifications.class)
-        //
-        .optModelUrls(clsModelUrls)
-        //
-        .optTranslator(new PpWordRotateTranslator()).build();
+      //
+      .optEngine("PaddlePaddle")
+      //
+      .setTypes(Image.class, Classifications.class)
+      //
+      .optModelUrls(clsModelUrls)
+      //
+      .optTranslator(new PpWordRotateTranslator()).build();
     ZooModel<Image, Classifications> rotateModel = criteria2.loadModel();
     // 翻转器
     Predictor<Image, Classifications> rotateClassifier = rotateModel.newPredictor();
     return rotateClassifier;
   }
 
-  private Predictor<Image, DetectedObjects> getDetector()
-      throws ModelNotFoundException, MalformedModelException, IOException {
-    Criteria<Image, DetectedObjects> criteria1 = Criteria.builder()
-        //
-        .optEngine("PaddlePaddle")
-        //
-        .setTypes(Image.class, DetectedObjects.class)
-        //
-        .optModelUrls(detModelUrls)
-        //
-        .optTranslator(new PpWordDetectionTranslator(new ConcurrentHashMap<String, String>())).build();
-    //
-    ZooModel<Image, DetectedObjects> detectionModel = criteria1.loadModel();
-    // 检测器
-    Predictor<Image, DetectedObjects> detector = detectionModel.newPredictor();
-    return detector;
-  }
+
 
   public Image rotateImg(Image image) {
     try (NDManager manager = NDManager.newBaseManager()) {
@@ -159,8 +163,8 @@ public class PaddleOcrService {
     double[] extended = extendRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
     int width = img.getWidth();
     int height = img.getHeight();
-    int[] recovered = { (int) (extended[0] * width), (int) (extended[1] * height), (int) (extended[2] * width),
-        (int) (extended[3] * height) };
+    int[] recovered = {(int) (extended[0] * width), (int) (extended[1] * height), (int) (extended[2] * width),
+      (int) (extended[3] * height)};
     return img.getSubImage(recovered[0], recovered[1], recovered[2], recovered[3]);
   }
 
@@ -178,6 +182,6 @@ public class PaddleOcrService {
     double newY = centery - height / 2 < 0 ? 0 : centery - height / 2;
     double newWidth = newX + width > 1 ? 1 - newX : width;
     double newHeight = newY + height > 1 ? 1 - newY : height;
-    return new double[] { newX, newY, newWidth, newHeight };
+    return new double[]{newX, newY, newWidth, newHeight};
   }
 }

@@ -3,7 +3,6 @@ package com.luooqi.ocr.utils;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.MainFm;
 import com.luooqi.ocr.snap.ScreenCapture;
-import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeInputEvent;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -20,7 +19,7 @@ public class GlobalKeyListener implements NativeKeyListener {
   public void nativeKeyPressed(NativeKeyEvent e) {
     if (e.getKeyCode() == NativeKeyEvent.VC_F4) {
       preventEvent(e);
-      MainFm.doSnap();
+      MainFm.screenShotOcr();
     } else if (e.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
       if (ScreenCapture.isSnapping) {
         preventEvent(e);

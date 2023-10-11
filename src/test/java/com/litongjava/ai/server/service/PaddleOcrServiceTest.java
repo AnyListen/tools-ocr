@@ -15,7 +15,7 @@ public class PaddleOcrServiceTest {
 
   @Test
   public void index() {
-    String filePath="/Users/ping/Pictures/latex-test.png";
+    String filePath="D:\\images\\image.png";
     PaddleOcrService paddleOcrService=new PaddleOcrService();
     try {
       DetectedObjects index = paddleOcrService.index(new File(filePath));

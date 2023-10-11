@@ -19,10 +19,8 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.StaticLog;
-import com.benjaminwan.ocrlibrary.OcrEngine;
 import com.benjaminwan.ocrlibrary.OcrResult;
 import com.litongjava.ai.server.service.PaddleOcrService;
-import com.luooqi.ocr.local.LocalOCR;
 import com.luooqi.ocr.model.TextBlock;
 
 import java.awt.*;
@@ -50,6 +48,14 @@ public class OcrUtils {
       return extractDetectedObjects(index);
     }
     return "";
+  }
+
+  public static String recImgLocal(File file) throws MalformedModelException, ModelNotFoundException, TranslateException, IOException {
+    if (file.exists()) {
+      DetectedObjects index = paddleOcrService.index(file);
+      return extractDetectedObjects(index);
+    }
+    return "文件不存在";
   }
 
   private static String extractDetectedObjects(DetectedObjects objects) {
@@ -211,5 +217,6 @@ public class OcrUtils {
     }
     return CommUtils.combineTextBlocks(textBlocks, isEng);
   }
+
 
 }

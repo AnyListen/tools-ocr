@@ -5,11 +5,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.luooqi</groupId>
-  <artifactId>tool-ocr</artifactId>
+  <artifactId>tools-ocr</artifactId>
   <version>${soft.version}</version>
 
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.8</java.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
     <soft.version>1.2.6</soft.version>
+    <main.class>com.luooqi.ocr.MainFm</main.class>
   </properties>
 
   <dependencies>
@@ -48,24 +53,27 @@
     <dependency>
       <groupId>ai.djl</groupId>
       <artifactId>api</artifactId>
-      <version>0.21.0</version>
+      <version>0.23.0</version>
     </dependency>
 
-<!--    <dependency>-->
-<!--      <groupId>ai.djl.pytorch</groupId>-->
-<!--      <artifactId>pytorch-engine</artifactId>-->
-<!--      <version>0.21.0</version>-->
-<!--    </dependency>-->
+    <dependency>
+      <groupId>ai.djl.pytorch</groupId>
+      <artifactId>pytorch-engine</artifactId>
+      <version>0.23.0</version>
+    </dependency>
 
     <dependency>
       <groupId>ai.djl.paddlepaddle</groupId>
       <artifactId>paddlepaddle-model-zoo</artifactId>
-      <version>0.21.0</version>
+      <version>0.23.0</version>
     </dependency>
 
-
-
-
+    <!-- https://mvnrepository.com/artifact/com.litongjava/jfinal-aop -->
+    <dependency>
+      <groupId>com.litongjava</groupId>
+      <artifactId>jfinal-aop</artifactId>
+      <version>1.0.0</version>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -101,43 +109,17 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>8.8.3</version>
         <configuration>
-          <mainClass>com.luooqi.ocr.MainFm</mainClass>
+          <mainClass>com.luooqi.ocr.MainForm</mainClass>
           <appName>treehole</appName>
           <vendor>com.luooqi</vendor>
           <needShortcut>true</needShortcut>
           <bundleArguments>
-            <!--                        <runtime />-->
+            <!-- runtime />-->
             <copyright>luooqi@2020</copyright>
             <installdirChooser>true</installdirChooser>
           </bundleArguments>
           <nativeReleaseVersion>${soft.version}</nativeReleaseVersion>
-          <additionalAppResources>${project.basedir}/ocr/models</additionalAppResources>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>testCompile</id>
-            <phase>test-compile</phase>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <encoding>UTF-8</encoding>
-          <source>1.8</source>
-          <target>1.8</target>
+          <!--          <additionalAppResources>${project.basedir}/ocr/models</additionalAppResources>-->
         </configuration>
       </plugin>
     </plugins>
