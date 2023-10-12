@@ -42,6 +42,7 @@ import static javafx.application.Platform.runLater;
 public class MainFm extends Application {
 
   public static void main(String[] args) {
+    InitConfig.init();
     launch(args);
   }
 

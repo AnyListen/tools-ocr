@@ -2,6 +2,9 @@ package com.luooqi.ocr.local;
 
 import cn.hutool.log.StaticLog;
 import com.benjaminwan.ocrlibrary.OcrEngine;
+import com.litongjava.jfinal.aop.Aop;
+import com.litongjava.project.config.ConfigKeys;
+import com.litongjava.project.config.ProjectConfig;
 import com.luooqi.ocr.utils.LibraryUtils;
 
 public enum LocalOCR {
@@ -10,13 +13,14 @@ public enum LocalOCR {
   private final OcrEngine ocrEngine;
 
   LocalOCR() {
-    String libPath = "D:\\lib\\ocr-lib\\win64\\bin";
+    ProjectConfig projectConfig = Aop.get(ProjectConfig.class);
+    String libPath = projectConfig.getStr(ConfigKeys.libPath);
 
-    String modelsDir = "D:\\model\\ppocr-v3-NCNN-models";
-    String detName = "ch_PP-OCRv3_det_infer";
-    String clsName = "ch_ppocr_mobile_v2.0_cls_infer";
-    String recName = "ch_PP-OCRv3_rec_infer";
-    String keysName = "ppocr_keys_v1.txt";
+    String modelsDir = projectConfig.getStr(ConfigKeys.modelsDir);
+    String detName = projectConfig.getStr(ConfigKeys.detName);
+    String clsName = projectConfig.getStr(ConfigKeys.clsName);
+    String recName = projectConfig.getStr(ConfigKeys.recName);
+    String keysName = projectConfig.getStr(ConfigKeys.keysName);
 
     LibraryUtils.addLibary(libPath);
 
