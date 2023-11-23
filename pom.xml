@@ -73,6 +73,7 @@
       <groupId>ai.djl.pytorch</groupId>
       <artifactId>pytorch-engine</artifactId>
       <version>${djl.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- ONNX -->
     <dependency>
@@ -95,17 +96,20 @@
     </dependency>
 
     <!--windows gpu-->
+    <!-- https://mvnrepository.com/artifact/ai.djl.pytorch/pytorch-native-cu117 -->
 <!--    <dependency>-->
 <!--      <groupId>ai.djl.pytorch</groupId>-->
 <!--      <artifactId>pytorch-native-cu117</artifactId>-->
+<!--      <version>1.13.1</version>-->
 <!--      <classifier>win-x86_64</classifier>-->
-<!--      <version>1.13.0</version>-->
 <!--      <scope>runtime</scope>-->
 <!--    </dependency>-->
+
+
 <!--    <dependency>-->
 <!--      <groupId>ai.djl.pytorch</groupId>-->
 <!--      <artifactId>pytorch-jni</artifactId>-->
-<!--      <version>1.13.0-0.20.0</version>-->
+<!--      <version>2.0.1-0.25.0</version>-->
 <!--      <scope>runtime</scope>-->
 <!--    </dependency>-->
 
