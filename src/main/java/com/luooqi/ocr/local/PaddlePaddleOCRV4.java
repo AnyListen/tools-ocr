@@ -9,7 +9,6 @@ import ai.djl.opencv.OpenCVImageFactory;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.TranslateException;
 import com.litongjava.djl.paddle.ocr.v4.common.RotatedBox;
 import com.litongjava.djl.paddle.ocr.v4.common.RotatedBoxCompX;
 import com.litongjava.djl.paddle.ocr.v4.detection.OcrV4Detection;
@@ -18,7 +17,6 @@ import com.litongjava.djl.paddle.ocr.v4.recognition.OcrV4Recognition;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,7 +29,6 @@ public enum PaddlePaddleOCRV4 {
   private OcrV4Detection detection;
   private OcrV4Recognition recognition;
   private Predictor<Image, NDList> detector;
-  private Predictor<Image, String> recognize;
   private Predictor<Image, String> recognizer;
   private NDManager manager;
 
@@ -56,7 +53,6 @@ public enum PaddlePaddleOCRV4 {
     manager = NDManager.newBaseManager();
   }
 
-  ;
 
   //noting not to do.but init
   public void init() {

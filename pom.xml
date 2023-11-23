@@ -6,14 +6,13 @@
 
   <groupId>com.luooqi</groupId>
   <artifactId>tools-ocr</artifactId>
-  <version>${soft.version}</version>
+  <version>1.2.7</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <soft.version>1.2.7</soft.version>
     <main.class>com.luooqi.ocr.MainFm</main.class>
     <lombok.version>1.18.20</lombok.version>
     <logback.version>1.2.3</logback.version>
