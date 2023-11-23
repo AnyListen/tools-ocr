@@ -14,9 +14,8 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.StaticLog;
-import com.benjaminwan.ocrlibrary.OcrEngine;
 import com.benjaminwan.ocrlibrary.OcrResult;
-import com.luooqi.ocr.local.LocalOCR;
+import com.luooqi.ocr.local.PaddlePaddleOCRV4;
 import com.luooqi.ocr.model.TextBlock;
 
 import java.awt.*;
@@ -34,20 +33,21 @@ public class OcrUtils {
   public static String recImgLocal(byte[] imgData) {
     String path = "tmp_" + Math.abs(Arrays.hashCode(imgData)) + ".png";
     File file = FileUtil.writeBytes(imgData, path);
-    if (file.exists()) {
-      OcrEngine ocrEngine = LocalOCR.INSTANCE.getOcrEngine();
-      OcrResult ocrResult = ocrEngine.detect(file.getAbsolutePath());
-      file.delete();
-      return extractLocalResult(ocrResult);
-    }
-    return "";
+    return recImgLocal(file);
   }
 
   public static String recImgLocal(File file) {
     if (file.exists()) {
-      OcrEngine ocrEngine = LocalOCR.INSTANCE.getOcrEngine();
-      OcrResult ocrResult = ocrEngine.detect(file.getAbsolutePath());
-      return extractLocalResult(ocrResult);
+//      OcrEngine ocrEngine = LocalOCR.INSTANCE.getOcrEngine();
+//      OcrResult ocrResult = ocrEngine.detect(file.getAbsolutePath());
+//      return extractLocalResult(ocrResult);
+      //替换为PaddlePaddleOCRV4
+      try {
+        return PaddlePaddleOCRV4.INSTANCE.ocr(file);
+      } catch (Exception e) {
+        e.printStackTrace();
+        return e.getMessage();
+      }
     }
     return "文件不存在";
   }

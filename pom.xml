@@ -13,8 +13,11 @@
     <java.version>1.8</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <soft.version>1.2.6</soft.version>
+    <soft.version>1.2.7</soft.version>
     <main.class>com.luooqi.ocr.MainFm</main.class>
+    <lombok.version>1.18.20</lombok.version>
+    <logback.version>1.2.3</logback.version>
+    <djl.version>0.22.1</djl.version>
   </properties>
 
   <dependencies>
@@ -38,23 +41,51 @@
     </dependency>
 
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.20</version>
+      <version>${lombok.version}</version>
       <scope>provided</scope>
     </dependency>
-
-    <!-- https://mvnrepository.com/artifact/com.litongjava/jfinal-aop -->
     <dependency>
-      <groupId>com.litongjava</groupId>
-      <artifactId>jfinal-aop</artifactId>
-      <version>1.0.0</version>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+    </dependency>
+
+    <!-- 服务器端推理引擎 -->
+    <dependency>
+      <groupId>ai.djl</groupId>
+      <artifactId>api</artifactId>
+      <version>${djl.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ai.djl</groupId>
+      <artifactId>basicdataset</artifactId>
+      <version>${djl.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ai.djl</groupId>
+      <artifactId>model-zoo</artifactId>
+      <version>${djl.version}</version>
+    </dependency>
+
+    <!-- ONNX 无NDArray ，需要借用pytorch-->
+    <dependency>
+      <groupId>ai.djl.pytorch</groupId>
+      <artifactId>pytorch-engine</artifactId>
+      <version>${djl.version}</version>
+    </dependency>
+    <!-- ONNX -->
+    <dependency>
+      <groupId>ai.djl.onnxruntime</groupId>
+      <artifactId>onnxruntime-engine</artifactId>
+      <version>${djl.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ai.djl.opencv</groupId>
+      <artifactId>opencv</artifactId>
+      <version>${djl.version}</version>
     </dependency>
 
     <dependency>

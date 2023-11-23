@@ -150,3 +150,5 @@ cmake-build-debug/
 cmake-build-debug-mingw/
 venv/
 .idea/
+ch_PP-OCRv4_det_infer/
+ch_PP-OCRv4_rec_infer/
