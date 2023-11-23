@@ -6,7 +6,7 @@
 
   <groupId>com.luooqi</groupId>
   <artifactId>tools-ocr</artifactId>
-  <version>1.2.7</version>
+  <version>2.2.8</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,7 +16,7 @@
     <main.class>com.luooqi.ocr.MainFm</main.class>
     <lombok.version>1.18.20</lombok.version>
     <logback.version>1.2.3</logback.version>
-    <djl.version>0.22.1</djl.version>
+    <djl.version>0.25.0</djl.version>
   </properties>
 
   <dependencies>
@@ -94,6 +94,21 @@
       <scope>test</scope>
     </dependency>
 
+    <!--windows gpu-->
+<!--    <dependency>-->
+<!--      <groupId>ai.djl.pytorch</groupId>-->
+<!--      <artifactId>pytorch-native-cu117</artifactId>-->
+<!--      <classifier>win-x86_64</classifier>-->
+<!--      <version>1.13.0</version>-->
+<!--      <scope>runtime</scope>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>ai.djl.pytorch</groupId>-->
+<!--      <artifactId>pytorch-jni</artifactId>-->
+<!--      <version>1.13.0-0.20.0</version>-->
+<!--      <scope>runtime</scope>-->
+<!--    </dependency>-->
+
   </dependencies>
   <build>
     <plugins>
@@ -130,8 +145,8 @@
             <copyright>luooqi@2020</copyright>
             <installdirChooser>true</installdirChooser>
           </bundleArguments>
-          <nativeReleaseVersion>${soft.version}</nativeReleaseVersion>
-          <!--          <additionalAppResources>${project.basedir}/ocr/models</additionalAppResources>-->
+          <nativeReleaseVersion>${project.version}</nativeReleaseVersion>
+          <additionalAppResources>${project.basedir}/models</additionalAppResources>
         </configuration>
       </plugin>
     </plugins>
