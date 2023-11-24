@@ -1,47 +1,49 @@
-#name: Java CI with Maven and Java FX
-#
-#on:
-#  push:
-#    branches: [ "master" ]
-#  pull_request:
-#    branches: [ "master" ]
-#
-#jobs:
-#  build_windows:
-#    runs-on: windows-latest
-#
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: Set up JDK 8
-#        uses: actions/setup-java@v3
-#        with:
-#          java-version: '8'
-#          distribution: 'oracle'
-#          cache: maven
-#
-#      - name: Download and Extract Models
-#        run: |
-#          Invoke-WebRequest -Uri "https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_det_infer-onnx.zip" -OutFile "model_det.zip"
-#          Invoke-WebRequest -Uri "https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_rec_infer-onnx.zip" -OutFile "model_rec.zip"
-#          mkdir models\ch_PP-OCRv4_det_infer
-#          mkdir models\ch_PP-OCRv4_rec_infer
-#          Expand-Archive "model_det.zip" -DestinationPath "models\ch_PP-OCRv4_det_infer"
-#          Expand-Archive "model_rec.zip" -DestinationPath "models\ch_PP-OCRv4_rec_infer"
-#
-#      - name: Copy Models
-#        run: |
-#          mkdir target\jfx\app
-#          xcopy models target\jfx\app /E /I
-#
-#
-#      - name: Build with Maven
-#        run: mvn jfx:native -DskipTests
-#
-#      - name : Show Native Files
-#        run : dir target\jfx\native
-#          -
-#      - name: Upload package
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: treehole-windows-2.2.8.msi
-#          path: target\jfx\native\treehole-2.2.8.msi
+name: Java CI with Maven and Java FX
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build_windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '1.8'
+          distribution: 'zulu'
+          javafx: true
+          cache: maven
+
+      - name: Download and Extract Models
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_det_infer-onnx.zip" -OutFile "model_det.zip"
+          Invoke-WebRequest -Uri "https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_rec_infer-onnx.zip" -OutFile "model_rec.zip"
+          mkdir models\ch_PP-OCRv4_det_infer
+          mkdir models\ch_PP-OCRv4_rec_infer
+          Expand-Archive "model_det.zip" -DestinationPath "models\ch_PP-OCRv4_det_infer"
+          Expand-Archive "model_rec.zip" -DestinationPath "models\ch_PP-OCRv4_rec_infer"
+
+      - name: Copy Models
+        run: |
+          mkdir target\jfx\app
+          xcopy models target\jfx\app /E /I
+
+
+      - name: Build with Maven
+        run: mvn jfx:native -DskipTests
+
+      - name : Show Native Files
+        run : dir target\jfx\native
+          -
+      - name: Upload package
+        uses: actions/upload-artifact@v3
+        with:
+          name: target-jfx-windows-x64
+          path: target\jfx\
