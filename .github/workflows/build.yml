@@ -18,42 +18,7 @@ jobs:
           java-version: '8'
           distribution: 'zulu'
           cache: maven
-
-
-  要在你的GitHub Actions工作流程中下载文件并将其解压到models目录下，你需要添加额外的步骤来完成这个任务。以下是你可能要添加到build.yml文件中的步骤：
-
-  安装解压工具：首先确保你有必要的工具来解压.zip文件。Windows运行环境通常已经预装了这些工具。
-
-  下载文件：使用curl或wget（在Windows运行器中也可用）来下载文件。
-
-  解压文件：使用Expand-Archive PowerShell命令来解压文件。
-
-  这里是如何在你的工作流中实现这一过程的示例：
-
-  yaml
-  Copy code
-name: Java CI with Maven and Java FX
-
-on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
-jobs:
-  build_windows:
-    runs-on: windows-latest
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 8
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'zulu'
-          cache: maven
-
+          
       - name: Download and Extract Models
         run: |
           Invoke-WebRequest -Uri "https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_det_infer-onnx.zip" -OutFile "model_det.zip"
