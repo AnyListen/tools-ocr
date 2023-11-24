@@ -151,7 +151,7 @@
           </bundleArguments>
           <nativeReleaseVersion>${project.version}</nativeReleaseVersion>
 <!--          <additionalAppResources>${project.basedir}/models</additionalAppResources>-->
-          <additionalBundlerResources>${project.basedir}/models</additionalBundlerResources>
+<!--          <additionalBundlerResources>${project.basedir}/models</additionalBundlerResources>-->
         </configuration>
       </plugin>
     </plugins>
