@@ -28,11 +28,12 @@ jobs:
           cp -r models/* target/jfx/app/
 
       - name: Build with Docker
-        run: docker run --rm \
-          -v ${{ github.workspace }}:/workspace \
-          -w /workspace \
-          litongjava/centos-7-maven:3.8.8 \
-          mvn jfx:native -DskipTests
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            litongjava/centos-7-maven:3.8.8 \
+            mvn jfx:native -DskipTests
 
       - name: Show Native Files
         run: ls target/jfx/native
