@@ -1,0 +1,16 @@
+{
+  "name": "tools-ocr",
+  "version": "1.0.0",
+  "description": "docs",
+  "main": "index.js",
+  "repository": "git@github.com:litongjava/tools-ocr.git",
+  "author": "litongjava <litongjava@qq.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vuepress dev docs",
+    "build": "vuepress build docs"
+  },
+  "devDependencies": {
+    "vuepress": "^1.8.2"
+  }
+}
