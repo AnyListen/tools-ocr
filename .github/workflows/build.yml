@@ -25,7 +25,7 @@ jobs:
       - name: Copy Models
         run: |
           mkdir -p target/jfx/app
-          cp -r models/* target/jfx/app/
+          cp -r models target/jfx/app/
 
       - name: Build with Docker
         run: |
@@ -42,4 +42,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: target-jfx-native-linux-x64
-          path: target/jfx/native
+          path: target/jfx/native/
