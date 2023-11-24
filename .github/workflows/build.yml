@@ -1,4 +1,4 @@
-name: Java CI with Maven and Java FX
+name: Docker JavaFX
 
 on:
   push:
@@ -8,41 +8,37 @@ on:
 
 jobs:
   build_windows:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up JDK 8
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8.0.292'
-          distribution: 'zulu'
-          cache: maven
-
       - name: Download and Extract Models
         run: |
-          Invoke-WebRequest -Uri "https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_det_infer-onnx.zip" -OutFile "model_det.zip"
-          Invoke-WebRequest -Uri "https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_rec_infer-onnx.zip" -OutFile "model_rec.zip"
-          mkdir models\ch_PP-OCRv4_det_infer
-          mkdir models\ch_PP-OCRv4_rec_infer
-          Expand-Archive "model_det.zip" -DestinationPath "models\ch_PP-OCRv4_det_infer"
-          Expand-Archive "model_rec.zip" -DestinationPath "models\ch_PP-OCRv4_rec_infer"
+          wget https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_det_infer-onnx.zip
+          wget https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_rec_infer-onnx.zip
+          mkdir -p models/ch_PP-OCRv4_det_infer
+          mkdir -p models/ch_PP-OCRv4_rec_infer
+          unzip ch_PP-OCRv4_det_infer-onnx.zip -d models/ch_PP-OCRv4_det_infer
+          unzip ch_PP-OCRv4_rec_infer-onnx.zip -d models/ch_PP-OCRv4_rec_infer
 
       - name: Copy Models
         run: |
-          mkdir target\jfx\app
-          xcopy models target\jfx\app /E /I
+          mkdir -p target/jfx/app
+          cp -r models/* target/jfx/app/
 
+      - name: Build with Docker
+        run: docker run --rm \
+          -v $(pwd):/workspace \
+          -w /workspace \
+          litongjava/centos-7-maven:3.8.8 \
+          mvn jfx:native -DskipTests
 
-      - name: Build with Maven
-        run: mvn jfx:native -DskipTests
+      - name: Show Native Files
+        run: ls target/jfx/native
 
-      - name : Show Native Files
-        run : dir target\jfx\native
-          -
       - name: Upload package
         uses: actions/upload-artifact@v3
         with:
-          name: target-jfx-windows-x64
-          path: target\jfx\
+          name: target-jfx-native-linux-x64
+          path: target/jfx/native
