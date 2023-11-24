@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '8'
-          distribution: 'zulu'
+          distribution: 'oracle'
           cache: maven
 
       - name: Download and Extract Models

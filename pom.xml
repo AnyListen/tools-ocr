@@ -94,24 +94,42 @@
       <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
+    <!-- GraalVM - Java Fx -->
+    <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
+<!--    <dependency>-->
+<!--      <groupId>org.openjfx</groupId>-->
+<!--      <artifactId>javafx-controls</artifactId>-->
+<!--      <version>11</version>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>org.openjfx</groupId>-->
+<!--      <artifactId>javafx-swing</artifactId>-->
+<!--      <version>11</version>-->
+<!--    </dependency>-->
+<!--    <dependency>-->
+<!--      <groupId>org.openjfx</groupId>-->
+<!--      <artifactId>javafx-fxml</artifactId>-->
+<!--      <version>11</version>-->
+<!--    </dependency>-->
+
 
     <!--windows gpu-->
     <!-- https://mvnrepository.com/artifact/ai.djl.pytorch/pytorch-native-cu117 -->
-<!--    <dependency>-->
-<!--      <groupId>ai.djl.pytorch</groupId>-->
-<!--      <artifactId>pytorch-native-cu117</artifactId>-->
-<!--      <version>1.13.1</version>-->
-<!--      <classifier>win-x86_64</classifier>-->
-<!--      <scope>runtime</scope>-->
-<!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>ai.djl.pytorch</groupId>-->
+    <!--      <artifactId>pytorch-native-cu117</artifactId>-->
+    <!--      <version>1.13.1</version>-->
+    <!--      <classifier>win-x86_64</classifier>-->
+    <!--      <scope>runtime</scope>-->
+    <!--    </dependency>-->
 
 
-<!--    <dependency>-->
-<!--      <groupId>ai.djl.pytorch</groupId>-->
-<!--      <artifactId>pytorch-jni</artifactId>-->
-<!--      <version>2.0.1-0.25.0</version>-->
-<!--      <scope>runtime</scope>-->
-<!--    </dependency>-->
+    <!--    <dependency>-->
+    <!--      <groupId>ai.djl.pytorch</groupId>-->
+    <!--      <artifactId>pytorch-jni</artifactId>-->
+    <!--      <version>2.0.1-0.25.0</version>-->
+    <!--      <scope>runtime</scope>-->
+    <!--    </dependency>-->
 
   </dependencies>
   <build>
@@ -150,8 +168,8 @@
             <installdirChooser>true</installdirChooser>
           </bundleArguments>
           <nativeReleaseVersion>${project.version}</nativeReleaseVersion>
-<!--          <additionalAppResources>${project.basedir}/models</additionalAppResources>-->
-<!--          <additionalBundlerResources>${project.basedir}/models</additionalBundlerResources>-->
+          <!--          <additionalAppResources>${project.basedir}/models</additionalAppResources>-->
+          <!--          <additionalBundlerResources>${project.basedir}/models</additionalBundlerResources>-->
         </configuration>
       </plugin>
     </plugins>
