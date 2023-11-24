@@ -11,7 +11,8 @@
 ## 安装
 > - **安装路径请勿包含中文字符**；
 > - 本程序使用 JavaFX 开发，提供的安装包中已经包含了Java
-> - 从release下载最新版本解压安装即可
+> - 从[release](https://github.com/litongjava/tools-ocr/releases/)下载最新版本解压安装即可
+
 
 ## 程序使用
 ### 启动截图
