@@ -22,7 +22,7 @@ jobs:
       - name: Copy Modles
         run : |
           mkdir target\jfx\app -p
-          cp -r models target\jfx\app
+          xcopy models target\jfx\app /E /I
 
       - name: Build with Maven
         run: mvn jfx:native -DskipTests
