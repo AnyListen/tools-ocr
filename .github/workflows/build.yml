@@ -18,13 +18,15 @@ jobs:
           java-version: '8'
           distribution: 'zulu'
           cache: maven
-          
+
       - name: Download and Extract Models
         run: |
           Invoke-WebRequest -Uri "https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_det_infer-onnx.zip" -OutFile "model_det.zip"
           Invoke-WebRequest -Uri "https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_rec_infer-onnx.zip" -OutFile "model_rec.zip"
-          Expand-Archive "model_det.zip" -DestinationPath "models"
-          Expand-Archive "model_rec.zip" -DestinationPath "models"
+          mkdir models\ch_PP-OCRv4_det_infer
+          mkdir models\ch_PP-OCRv4_rec_infer
+          Expand-Archive "model_det.zip" -DestinationPath "models\ch_PP-OCRv4_det_infer"
+          Expand-Archive "model_rec.zip" -DestinationPath "models\ch_PP-OCRv4_rec_infer"
 
       - name: Copy Models
         run: |
