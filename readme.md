@@ -2,6 +2,7 @@
 一款跨平台的 OCR 小工具,调用本地OCR进行识别,无需联网即可使用
 用到的技术和框架
 - jdk 1.8
+- javafx
 - djl
 - pytorch
 - onnx
