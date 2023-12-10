@@ -37,11 +37,21 @@
 
 ## 本地构建
 你下载代码在本地进行构建,构建命令如下
+windows
 ```
 mkdir target\jfx\app
 cp -r models target\jfx\app
 mvn jfx:native -DskipTests -f pom.xml
 ```
+
+macos
+```shell script
+rm -rf target/jfx/app
+mkdir -p target/jfx/app
+cp -r models target/jfx/app
+mvn jfx:native -DskipTests -f pom.xml
+```
+
 ## 注意事项
 ### MAC权限设置
 由于监控了截图快捷键，因此MAC需要开启相应的权限，请见下图：
