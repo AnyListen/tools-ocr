@@ -8,6 +8,9 @@
 - onnx
 - paddle ocr
 - opencv
+
+## 开源地址
+[gitee](https://gitee.com/ppnt/tools-ocr) | [github](https://github.com/litongjava/tools-ocr)
 ## 安装
 > - **安装路径请勿包含中文字符**；
 > - 本程序使用 JavaFX 开发，提供的安装包中已经包含了Java
