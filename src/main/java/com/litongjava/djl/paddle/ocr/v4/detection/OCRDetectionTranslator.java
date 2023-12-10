@@ -104,18 +104,20 @@ public class OCRDetectionTranslator implements Translator<Image, NDList> {
       srcMat.release();
     }
 
+    NDList dt_boxes = null;
     NDArray boxes = boxes_from_bitmap(manager, pred, newMask);
+    if (boxes != null) {
+      //boxes[:, :, 0] = boxes[:, :, 0] / ratio_w
+      NDArray boxes1 = boxes.get(":, :, 0").div(ratio_w);
+      boxes.set(new NDIndex(":, :, 0"), boxes1);
+      //boxes[:, :, 1] = boxes[:, :, 1] / ratio_h
+      NDArray boxes2 = boxes.get(":, :, 1").div(ratio_h);
+      boxes.set(new NDIndex(":, :, 1"), boxes2);
 
-    //boxes[:, :, 0] = boxes[:, :, 0] / ratio_w
-    NDArray boxes1 = boxes.get(":, :, 0").div(ratio_w);
-    boxes.set(new NDIndex(":, :, 0"), boxes1);
-    //boxes[:, :, 1] = boxes[:, :, 1] / ratio_h
-    NDArray boxes2 = boxes.get(":, :, 1").div(ratio_h);
-    boxes.set(new NDIndex(":, :, 1"), boxes2);
+      dt_boxes = this.filter_tag_det_res(boxes);
 
-    NDList dt_boxes = this.filter_tag_det_res(boxes);
-
-    dt_boxes.detach();
+      dt_boxes.detach();
+    }
 
     // release Mat
     newMask.release();
@@ -255,12 +257,18 @@ public class OCRDetectionTranslator implements Translator<Image, NDList> {
       newContour.release();
     }
 
-    NDArray boxes = NDArrays.stack(boxList);
-
     // release
     hierarchy.release();
 
+    NDArray boxes = null;
+    if (boxList.size() > 0) {
+      boxes = NDArrays.stack(boxList);
+      return boxes;
+    }
+
     return boxes;
+
+
   }
 
   /**

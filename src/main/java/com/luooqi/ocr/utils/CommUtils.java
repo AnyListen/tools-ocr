@@ -1,33 +1,7 @@
 package com.luooqi.ocr.utils;
 
-import cn.hutool.core.util.CharUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.log.StaticLog;
-import com.luooqi.ocr.MainFm;
-import com.luooqi.ocr.model.TextBlock;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.control.Button;
-import javafx.scene.control.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.MemoryCacheImageOutputStream;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,12 +14,47 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
+import javax.swing.ImageIcon;
+
+import cn.hutool.core.util.ClassUtil;
+import com.luooqi.ocr.OcrApp;
+import com.luooqi.ocr.constants.ImagesConstants;
+import com.luooqi.ocr.model.TextBlock;
+
+import cn.hutool.core.util.CharUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.log.StaticLog;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
+import javafx.scene.control.Separator;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+
 public class CommUtils {
 
   public static final Paint MASK_COLOR = Color.rgb(0, 0, 0, 0.4);
   public static final int BUTTON_SIZE = 28;
-  public static Background BG_TRANSPARENT = new Background(new BackgroundFill(Color.TRANSPARENT,
-    CornerRadii.EMPTY, Insets.EMPTY));
+  public static Background BG_TRANSPARENT = new Background(
+    new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY));
   private static Pattern NORMAL_CHAR = Pattern.compile("[\\u4e00-\\u9fa5\\w、-，/|_]");
   public static Separator SEPARATOR = new Separator(Orientation.VERTICAL);
   private static final float IMAGE_QUALITY = 0.5f;
@@ -97,7 +106,7 @@ public class CommUtils {
     int maxX = -1;
     double maxAngle = -100;
     for (TextBlock textBlock : textBlocks) {
-      //System.out.println(textBlock.getAngle()+ "\t" + textBlock.getFontSize());
+      // System.out.println(textBlock.getAngle()+ "\t" + textBlock.getFontSize());
       if (textBlock.getTopLeft().x < minX) {
         minX = textBlock.getTopLeft().x;
         minBlock = textBlock;
@@ -138,10 +147,8 @@ public class CommUtils {
           continue;
         }
         String endTxt = blockTxt.substring(blockTxt.length() - 1);
-        if (maxX - lastBlock.getTopRight().x >= CHAR_WIDTH * 2 ||
-          !NORMAL_CHAR.matcher(endTxt).find() ||
-          (NORMAL_CHAR.matcher(endTxt).find() &&
-            (firstBlock.getTopLeft().x - minX) > CHAR_WIDTH * 2)) {
+        if (maxX - lastBlock.getTopRight().x >= CHAR_WIDTH * 2 || !NORMAL_CHAR.matcher(endTxt).find()
+          || (NORMAL_CHAR.matcher(endTxt).find() && (firstBlock.getTopLeft().x - minX) > CHAR_WIDTH * 2)) {
           sb.append("\n");
           for (int i = 0, ln = (firstBlock.getTopLeft().x - minX) / CHAR_WIDTH; i < ln; i++) {
             if (i % 2 == 0) {
@@ -149,7 +156,8 @@ public class CommUtils {
             }
           }
         } else {
-          if (CharUtil.isLetterOrNumber(endTxt.charAt(0)) && CharUtil.isLetterOrNumber(firstBlock.getText().charAt(0))) {
+          if (CharUtil.isLetterOrNumber(endTxt.charAt(0))
+            && CharUtil.isLetterOrNumber(firstBlock.getText().charAt(0))) {
             sb.append(" ");
           }
         }
@@ -165,8 +173,8 @@ public class CommUtils {
         TextBlock text = line.get(i);
         String ocrText = text.getText();
         if (i > 0) {
-          for (int a = 0, ln = (text.getTopLeft().x - line.get(i - 1).getTopRight().x) / (CHAR_WIDTH * 2);
-               a < ln; a++) {
+          for (int a = 0,
+               ln = (text.getTopLeft().x - line.get(i - 1).getTopRight().x) / (CHAR_WIDTH * 2); a < ln; a++) {
             sb.append("  ");
           }
         }
@@ -250,17 +258,18 @@ public class CommUtils {
   }
 
   public static void initStage(Stage stage) {
+
     try {
       if (CommUtils.IS_MAC_OS) {
-        URL iconURL = MainFm.class.getResource("/img/logo.png");
+        URL iconURL = ClassUtil.getClassLoader().getResource(ImagesConstants.LOGO);
         java.awt.Image image = new ImageIcon(iconURL).getImage();
         Class appleApp = Class.forName("com.apple.eawt.Application");
-        //noinspection unchecked
+        // noinspection unchecked
         Method getApplication = appleApp.getMethod("getApplication");
         Object application = getApplication.invoke(appleApp);
         Class[] params = new Class[1];
         params[0] = java.awt.Image.class;
-        //noinspection unchecked
+        // noinspection unchecked
         Method setDockIconImage = appleApp.getMethod("setDockIconImage", params);
         setDockIconImage.invoke(application, image);
       }
@@ -268,7 +277,8 @@ public class CommUtils {
       StaticLog.error(e);
     }
     stage.setTitle("树洞OCR文字识别");
-    stage.getIcons().add(new javafx.scene.image.Image(MainFm.class.getResource("/img/logo.png").toExternalForm()));
+    URL iconURL = ClassUtil.getClassLoader().getResource(ImagesConstants.LOGO);
+    stage.getIcons().add(new javafx.scene.image.Image(iconURL.toExternalForm()));
   }
 
   private static final Pattern SCALE_PATTERN = Pattern.compile("renderScale:([\\d.]+)");
@@ -276,8 +286,7 @@ public class CommUtils {
   public static Rectangle getDisplayScreen(Stage stage) {
     Screen crtScreen = getCrtScreen(stage);
     Rectangle2D rectangle2D = crtScreen.getBounds();
-    return new Rectangle((int) rectangle2D.getMinX(), (int) rectangle2D.getMinY(),
-      (int) rectangle2D.getWidth(),
+    return new Rectangle((int) rectangle2D.getMinX(), (int) rectangle2D.getMinY(), (int) rectangle2D.getWidth(),
       (int) rectangle2D.getHeight());
   }
 

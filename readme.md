@@ -8,6 +8,9 @@
 - onnx
 - paddle ocr
 - opencv
+
+## 开源地址
+[gitee](https://gitee.com/ppnt/tools-ocr) | [github](https://github.com/litongjava/tools-ocr)
 ## 安装
 > - **安装路径请勿包含中文字符**；
 > - 本程序使用 JavaFX 开发，提供的安装包中已经包含了Java
@@ -49,6 +52,7 @@ mvn jfx:native -DskipTests -f pom.xml
 ![2](readme_files/2.jpg)
 
 ## TODO
+- [x] PDF识别
 - [x] 图片文字识别
   - [x] 识别结果文本对齐（暂未实现多分栏）
   - [x] 全屏模式下截图

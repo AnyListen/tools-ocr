@@ -64,6 +64,9 @@ public final class OcrV4Recognition {
                                   Image image, Predictor<Image, NDList> detector, Predictor<Image, String> recognizer)
     throws TranslateException {
     NDList boxes = detector.predict(image);
+    if (boxes == null) {
+      return null;
+    }
     // 交给 NDManager自动管理内存
     // attach to manager for automatic memory management
     boxes.attach(manager);

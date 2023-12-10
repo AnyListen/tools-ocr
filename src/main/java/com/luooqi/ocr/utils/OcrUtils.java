@@ -1,9 +1,12 @@
 package com.luooqi.ocr.utils;
 
+import ai.djl.modality.cv.Image;
+import ai.djl.opencv.OpenCVImageFactory;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.CharsetUtil;
+import cn.hutool.core.util.HashUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.crypto.SecureUtil;
@@ -17,9 +20,16 @@ import cn.hutool.log.StaticLog;
 import com.benjaminwan.ocrlibrary.OcrResult;
 import com.luooqi.ocr.local.PaddlePaddleOCRV4;
 import com.luooqi.ocr.model.TextBlock;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.util.*;
 
@@ -36,12 +46,13 @@ public class OcrUtils {
     return recImgLocal(file);
   }
 
+  public static String recImgLocal(BufferedImage image) {
+    byte[] bytes = CommUtils.imageToBytes(image);
+    return recImgLocal(bytes);
+  }
+
   public static String recImgLocal(File file) {
     if (file.exists()) {
-//      OcrEngine ocrEngine = LocalOCR.INSTANCE.getOcrEngine();
-//      OcrResult ocrResult = ocrEngine.detect(file.getAbsolutePath());
-//      return extractLocalResult(ocrResult);
-      //替换为PaddlePaddleOCRV4
       try {
         return PaddlePaddleOCRV4.INSTANCE.ocr(file);
       } catch (Exception e) {
@@ -50,6 +61,33 @@ public class OcrUtils {
       }
     }
     return "文件不存在";
+  }
+
+
+  public static String recPdfLocal(File pdfFile) {
+    if (pdfFile.exists()) {
+      try (PDDocument document = PDDocument.load(pdfFile)) {
+        PDFRenderer renderer = new PDFRenderer(document);
+        List<String> ocrResults = new ArrayList<>();
+
+        for (int i = 0; i < document.getNumberOfPages(); ++i) {
+          BufferedImage bufferedImage = renderer.renderImageWithDPI(i, 300);
+          long hashCode = HashUtil.hfHash(pdfFile.getName());
+          String filename = "temp_" + hashCode + "_" + i + ".png";
+          FileOutputStream fileOutputStream = new FileOutputStream(filename);
+          ImageIO.write(bufferedImage, "png", fileOutputStream); // 选择合适的格式，如 "png" 或 "jpg"
+          String text = recImgLocal(new File(filename));
+          ocrResults.add(text);
+        }
+        // 将所有页面的OCR结果合并为一个字符串
+        return String.join("\n", ocrResults);
+
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      return "文件不存在";
+    }
+    return null;
   }
 
 
