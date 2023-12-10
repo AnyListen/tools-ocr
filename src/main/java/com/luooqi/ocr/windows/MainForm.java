@@ -173,7 +173,7 @@ public class MainForm {
     }
     stageInfo = new StageInfo(stage.getX(), stage.getY(),
       stage.getWidth(), stage.getHeight(), stage.isFullScreen());
-    stage.close();
+
     try {
       //BufferedImage image = ImageIO.read(selectedFile);
       doOcr(selectedFile);
