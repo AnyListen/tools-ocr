@@ -9,6 +9,7 @@ import ai.djl.opencv.OpenCVImageFactory;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
+import ai.djl.translate.TranslateException;
 import com.litongjava.djl.paddle.ocr.v4.common.RotatedBox;
 import com.litongjava.djl.paddle.ocr.v4.common.RotatedBoxCompX;
 import com.litongjava.djl.paddle.ocr.v4.detection.OcrV4Detection;
@@ -62,7 +63,14 @@ public enum PaddlePaddleOCRV4 {
   public String ocr(File imageFile) throws Exception {
     Path path = imageFile.toPath();
     Image image = OpenCVImageFactory.getInstance().fromFile(path);
+    return ocr(image);
+  }
+
+  public String ocr(Image image) throws Exception {
     List<RotatedBox> detections = recognition.predict(manager, image, detector, recognizer);
+    if (detections == null) {
+      return null;
+    }
 
     List<RotatedBox> initList = new ArrayList<>();
     for (RotatedBox result : detections) {

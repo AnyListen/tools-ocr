@@ -21,7 +21,9 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.swing.ImageIcon;
 
+import cn.hutool.core.util.ClassUtil;
 import com.luooqi.ocr.OcrApp;
+import com.luooqi.ocr.constants.ImagesConstants;
 import com.luooqi.ocr.model.TextBlock;
 
 import cn.hutool.core.util.CharUtil;
@@ -52,7 +54,7 @@ public class CommUtils {
   public static final Paint MASK_COLOR = Color.rgb(0, 0, 0, 0.4);
   public static final int BUTTON_SIZE = 28;
   public static Background BG_TRANSPARENT = new Background(
-      new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY));
+    new BackgroundFill(Color.TRANSPARENT, CornerRadii.EMPTY, Insets.EMPTY));
   private static Pattern NORMAL_CHAR = Pattern.compile("[\\u4e00-\\u9fa5\\w、-，/|_]");
   public static Separator SEPARATOR = new Separator(Orientation.VERTICAL);
   private static final float IMAGE_QUALITY = 0.5f;
@@ -146,7 +148,7 @@ public class CommUtils {
         }
         String endTxt = blockTxt.substring(blockTxt.length() - 1);
         if (maxX - lastBlock.getTopRight().x >= CHAR_WIDTH * 2 || !NORMAL_CHAR.matcher(endTxt).find()
-            || (NORMAL_CHAR.matcher(endTxt).find() && (firstBlock.getTopLeft().x - minX) > CHAR_WIDTH * 2)) {
+          || (NORMAL_CHAR.matcher(endTxt).find() && (firstBlock.getTopLeft().x - minX) > CHAR_WIDTH * 2)) {
           sb.append("\n");
           for (int i = 0, ln = (firstBlock.getTopLeft().x - minX) / CHAR_WIDTH; i < ln; i++) {
             if (i % 2 == 0) {
@@ -155,7 +157,7 @@ public class CommUtils {
           }
         } else {
           if (CharUtil.isLetterOrNumber(endTxt.charAt(0))
-              && CharUtil.isLetterOrNumber(firstBlock.getText().charAt(0))) {
+            && CharUtil.isLetterOrNumber(firstBlock.getText().charAt(0))) {
             sb.append(" ");
           }
         }
@@ -172,7 +174,7 @@ public class CommUtils {
         String ocrText = text.getText();
         if (i > 0) {
           for (int a = 0,
-              ln = (text.getTopLeft().x - line.get(i - 1).getTopRight().x) / (CHAR_WIDTH * 2); a < ln; a++) {
+               ln = (text.getTopLeft().x - line.get(i - 1).getTopRight().x) / (CHAR_WIDTH * 2); a < ln; a++) {
             sb.append("  ");
           }
         }
@@ -256,9 +258,10 @@ public class CommUtils {
   }
 
   public static void initStage(Stage stage) {
+
     try {
       if (CommUtils.IS_MAC_OS) {
-        URL iconURL = OcrApp.class.getResource("/img/logo.png");
+        URL iconURL = ClassUtil.getClassLoader().getResource(ImagesConstants.LOGO);
         java.awt.Image image = new ImageIcon(iconURL).getImage();
         Class appleApp = Class.forName("com.apple.eawt.Application");
         // noinspection unchecked
@@ -274,7 +277,8 @@ public class CommUtils {
       StaticLog.error(e);
     }
     stage.setTitle("树洞OCR文字识别");
-    stage.getIcons().add(new javafx.scene.image.Image(OcrApp.class.getResource("/img/logo.png").toExternalForm()));
+    URL iconURL = ClassUtil.getClassLoader().getResource(ImagesConstants.LOGO);
+    stage.getIcons().add(new javafx.scene.image.Image(iconURL.toExternalForm()));
   }
 
   private static final Pattern SCALE_PATTERN = Pattern.compile("renderScale:([\\d.]+)");
@@ -283,7 +287,7 @@ public class CommUtils {
     Screen crtScreen = getCrtScreen(stage);
     Rectangle2D rectangle2D = crtScreen.getBounds();
     return new Rectangle((int) rectangle2D.getMinX(), (int) rectangle2D.getMinY(), (int) rectangle2D.getWidth(),
-        (int) rectangle2D.getHeight());
+      (int) rectangle2D.getHeight());
   }
 
   public static float getScale(Stage stage) {
