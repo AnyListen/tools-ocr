@@ -1,8 +1,8 @@
-package com.luooqi.ocr;
+package com.luooqi.ocr.windows;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
+import com.luooqi.ocr.OcrApp;
 import com.luooqi.ocr.config.InitConfig;
 import com.luooqi.ocr.controller.ProcessController;
 import com.luooqi.ocr.model.CaptureInfo;
@@ -10,7 +10,6 @@ import com.luooqi.ocr.model.StageInfo;
 import com.luooqi.ocr.snap.ScreenCapture;
 import com.luooqi.ocr.utils.CommUtils;
 import com.luooqi.ocr.utils.OcrUtils;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -32,20 +31,14 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import static javafx.application.Platform.runLater;
-
+/**
+ * Created by litonglinux@qq.com on 12/9/2023_4:40 PM
+ */
 @Slf4j
-public class MainFm extends Application {
-
-  public static void main(String[] args) {
-    InitConfig.init();
-    launch(args);
-  }
-
+public class MainForm {
   private static StageInfo stageInfo;
   public static Stage stage;
   private static Scene mainScene;
@@ -55,8 +48,8 @@ public class MainFm extends Application {
   //private static boolean isSegment = true;
   //private static String ocrText = "";
 
-  @Override
-  public void start(Stage primaryStage) {
+  public void init(Stage primaryStage) {
+
     log.info("primaryStage:{}", primaryStage);
     stage = primaryStage;
     setAutoResize();
@@ -76,8 +69,8 @@ public class MainFm extends Application {
 //        });
 
     HBox topBar = new HBox(
-      CommUtils.createButton("snapBtn", MainFm::screenShotOcr, "截图"),
-      CommUtils.createButton("openImageBtn", MainFm::openImageOcr, "打开"),
+      CommUtils.createButton("snapBtn", MainForm::screenShotOcr, "截图"),
+      CommUtils.createButton("openImageBtn", this::openImageOcr, "打开"),
       CommUtils.createButton("copyBtn", this::copyText, "复制"),
       CommUtils.createButton("pasteBtn", this::pasteText, "粘贴"),
       CommUtils.createButton("clearBtn", this::clearText, "清空"),
@@ -112,8 +105,6 @@ public class MainFm extends Application {
     CommUtils.initStage(primaryStage);
     mainScene = new Scene(root, 670, 470);
     stage.setScene(mainScene);
-    stage.show();
-//    InitConfig.after();
   }
 
   private void setAutoResize() {
@@ -134,10 +125,6 @@ public class MainFm extends Application {
     textArea.setWrapText(!textArea.isWrapText());
   }
 
-  @Override
-  public void stop() throws Exception {
-    GlobalScreen.unregisterNativeHook();
-  }
 
   private void clearText() {
     textArea.setText("");
@@ -170,13 +157,13 @@ public class MainFm extends Application {
     stageInfo.setWidth(stage.getWidth());
     stageInfo.setHeight(stage.getHeight());
     stageInfo.setFullScreenState(stage.isFullScreen());
-    runLater(screenCapture::prepareForCapture);
+    Platform.runLater(screenCapture::prepareForCapture);
   }
 
   /**
    * 打开图片
    */
-  private static void openImageOcr() {
+  private void openImageOcr() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Please Select Image File");
     fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg"));
@@ -186,7 +173,7 @@ public class MainFm extends Application {
     }
     stageInfo = new StageInfo(stage.getX(), stage.getY(),
       stage.getWidth(), stage.getHeight(), stage.isFullScreen());
-    MainFm.stage.close();
+    stage.close();
     try {
       //BufferedImage image = ImageIO.read(selectedFile);
       doOcr(selectedFile);
@@ -197,7 +184,7 @@ public class MainFm extends Application {
 
 
   public static void cancelSnap() {
-    runLater(screenCapture::cancelSnap);
+    Platform.runLater(screenCapture::cancelSnap);
   }
 
   public static void doOcr(BufferedImage image) {
@@ -225,7 +212,7 @@ public class MainFm extends Application {
   }
 
   public static void doOcr(File selectedFile) {
-    org.slf4j.Logger log = LoggerFactory.getLogger(MainFm.class);
+    org.slf4j.Logger log = LoggerFactory.getLogger(OcrApp.class);
     processController.setX(CaptureInfo.ScreenMinX + (CaptureInfo.ScreenWidth - 300) / 2);
     processController.setY(250);
     processController.show();

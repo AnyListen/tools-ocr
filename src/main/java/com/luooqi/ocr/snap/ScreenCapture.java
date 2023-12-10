@@ -3,9 +3,10 @@ package com.luooqi.ocr.snap;
 
 import cn.hutool.core.swing.ScreenUtil;
 import cn.hutool.log.StaticLog;
-import com.luooqi.ocr.MainFm;
+import com.luooqi.ocr.OcrApp;
 import com.luooqi.ocr.model.CaptureInfo;
 import com.luooqi.ocr.utils.CommUtils;
+import com.luooqi.ocr.windows.MainForm;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
@@ -22,6 +23,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import sun.applet.Main;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -180,8 +182,7 @@ public class ScreenCapture {
 
     mainCanvas.setOnMouseDragged(m -> {
       if (m.getButton() == MouseButton.PRIMARY) {
-        if (m.getScreenX() >= CaptureInfo.ScreenMinX &&
-          m.getScreenX() <= CaptureInfo.ScreenMaxX) {
+        if (m.getScreenX() >= CaptureInfo.ScreenMinX && m.getScreenX() <= CaptureInfo.ScreenMaxX) {
           data.mouseXNow = (int) m.getX();
         } else if (m.getScreenX() > CaptureInfo.ScreenMaxX) {
           data.mouseXNow = CaptureInfo.ScreenWidth;
@@ -311,8 +312,7 @@ public class ScreenCapture {
       }
     });
 
-    data.anyPressed.addListener((obs, wasPressed, isNowPressed) ->
-    {
+    data.anyPressed.addListener((obs, wasPressed, isNowPressed) -> {
       if (isNowPressed) {
         yPressedAnimation.start();
       } else {
@@ -355,22 +355,23 @@ public class ScreenCapture {
 
     // smart calculation of where the mouse has been dragged
     data.rectWidth = (data.mouseXNow > data.mouseXPressed) ? data.mouseXNow - data.mouseXPressed // RIGHT
-      : data.mouseXPressed - data.mouseXNow // LEFT
+        : data.mouseXPressed - data.mouseXNow // LEFT
     ;
     data.rectHeight = (data.mouseYNow > data.mouseYPressed) ? data.mouseYNow - data.mouseYPressed // DOWN
-      : data.mouseYPressed - data.mouseYNow // UP
+        : data.mouseYPressed - data.mouseYNow // UP
     ;
 
     data.rectUpperLeftX = // -------->UPPER_LEFT_X
-      (data.mouseXNow > data.mouseXPressed) ? data.mouseXPressed // RIGHT
-        : data.mouseXNow// LEFT
+        (data.mouseXNow > data.mouseXPressed) ? data.mouseXPressed // RIGHT
+            : data.mouseXNow// LEFT
     ;
     data.rectUpperLeftY = // -------->UPPER_LEFT_Y
-      (data.mouseYNow > data.mouseYPressed) ? data.mouseYPressed // DOWN
-        : data.mouseYNow // UP
+        (data.mouseYNow > data.mouseYPressed) ? data.mouseYPressed // DOWN
+            : data.mouseYNow // UP
     ;
 
-    gc.strokeRect(data.rectUpperLeftX - 1.00, data.rectUpperLeftY - 1.00, data.rectWidth + 2.00, data.rectHeight + 2.00);
+    gc.strokeRect(data.rectUpperLeftX - 1.00, data.rectUpperLeftY - 1.00, data.rectWidth + 2.00,
+        data.rectHeight + 2.00);
     gc.clearRect(data.rectUpperLeftX, data.rectUpperLeftY, data.rectWidth, data.rectHeight);
 
     // draw the text
@@ -378,10 +379,11 @@ public class ScreenCapture {
       double middle = data.rectUpperLeftX + data.rectWidth / 2.00;
       gc.setLineWidth(1);
       gc.setFill(Color.FIREBRICK);
-      gc.fillRect(middle - 77, data.rectUpperLeftY < 50 ? data.rectUpperLeftY + 2 : data.rectUpperLeftY - 18.00, 100, 18);
+      gc.fillRect(middle - 77, data.rectUpperLeftY < 50 ? data.rectUpperLeftY + 2 : data.rectUpperLeftY - 18.00, 100,
+          18);
       gc.setFill(Color.WHITE);
       gc.fillText(data.rectWidth + " * " + data.rectHeight, middle - 77 + 9,
-        data.rectUpperLeftY < 50 ? data.rectUpperLeftY + 17.00 : data.rectUpperLeftY - 4.00);
+          data.rectUpperLeftY < 50 ? data.rectUpperLeftY + 17.00 : data.rectUpperLeftY - 4.00);
     }
   }
 
@@ -398,16 +400,16 @@ public class ScreenCapture {
 
   public void prepareForCapture() {
     isSnapping = true;
-    MainFm.stage.setOpacity(0.0f);
+    MainForm.stage.setOpacity(0.0f);
     Platform.runLater(() -> {
-      Rectangle rectangle = CommUtils.getDisplayScreen(MainFm.stage);
+      Rectangle rectangle = CommUtils.getDisplayScreen(MainForm.stage);
       data.reset();
       CaptureInfo.ScreenMinX = rectangle.x;
       CaptureInfo.ScreenMaxX = rectangle.x + rectangle.width;
       CaptureInfo.ScreenWidth = rectangle.width;
       CaptureInfo.ScreenHeight = rectangle.height;
       BufferedImage bufferedImage = ScreenUtil.captureScreen(rectangle);
-      //bufferedImage = Scalr.resize(bufferedImage, Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, CaptureInfo.ScreenWidth * 2, CaptureInfo.ScreenHeight * 2);
+      // bufferedImage = Scalr.resize(bufferedImage, Scalr.Method.QUALITY, Scalr.Mode.AUTOMATIC, CaptureInfo.ScreenWidth * 2, CaptureInfo.ScreenHeight * 2);
       WritableImage fxImage = SwingFXUtils.toFXImage(bufferedImage, null);
       deActivateAllKeys();
       scene.setRoot(new Pane());
@@ -417,9 +419,9 @@ public class ScreenCapture {
       mainCanvas.setHeight(CaptureInfo.ScreenHeight);
       mainCanvas.setCursor(Cursor.CROSSHAIR);
       initGraphContent();
-      rootPane.setBackground(new Background(new BackgroundImage(fxImage,
-        BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
-        BackgroundPosition.CENTER, new BackgroundSize(CaptureInfo.ScreenWidth, CaptureInfo.ScreenHeight, false, false, true, true))));
+      rootPane.setBackground(new Background(new BackgroundImage(fxImage, BackgroundRepeat.NO_REPEAT,
+          BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,
+          new BackgroundSize(CaptureInfo.ScreenWidth, CaptureInfo.ScreenHeight, false, false, true, true))));
       repaintCanvas();
       stage.setScene(scene);
       stage.setFullScreenExitHint("");
@@ -438,19 +440,21 @@ public class ScreenCapture {
     BufferedImage image;
     try {
       mainCanvas.setDisable(true);
-      image = new Robot().createScreenCapture(new Rectangle(data.rectUpperLeftX + CaptureInfo.ScreenMinX, data.rectUpperLeftY + (int) CommUtils.getCrtScreen(stage).getVisualBounds().getMinY(), data.rectWidth, data.rectHeight));
+      image = new Robot().createScreenCapture(new Rectangle(data.rectUpperLeftX + CaptureInfo.ScreenMinX,
+          data.rectUpperLeftY + (int) CommUtils.getCrtScreen(stage).getVisualBounds().getMinY(), data.rectWidth,
+          data.rectHeight));
     } catch (AWTException ex) {
       StaticLog.error(ex);
       return;
     } finally {
       mainCanvas.setDisable(false);
-      MainFm.restore(false);
+      MainForm.restore(false);
     }
-    MainFm.doOcr(image);
+    MainForm.doOcr(image);
   }
 
   public void cancelSnap() {
     deActivateAllKeys();
-    MainFm.restore(true);
+    MainForm.restore(true);
   }
 }

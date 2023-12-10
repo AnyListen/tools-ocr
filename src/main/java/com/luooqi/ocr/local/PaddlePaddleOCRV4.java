@@ -105,4 +105,9 @@ public enum PaddlePaddleOCRV4 {
     }
     return fullText.toString();
   }
+
+  public void close() {
+    detector.close();
+    recognizer.close();
+  }
 }
