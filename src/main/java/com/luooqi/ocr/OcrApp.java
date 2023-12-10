@@ -1,5 +1,6 @@
 package com.luooqi.ocr;
 
+import cn.hutool.core.thread.GlobalThreadPool;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.config.InitConfig;
@@ -61,7 +62,9 @@ public class OcrApp extends Application {
 
   @Override
   public void stop() throws Exception {
+    log.info("close");
     GlobalScreen.unregisterNativeHook();
     PaddlePaddleOCRV4.INSTANCE.close();
+    GlobalThreadPool.shutdown(true);
   }
 }

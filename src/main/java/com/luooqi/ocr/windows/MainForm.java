@@ -1,5 +1,6 @@
 package com.luooqi.ocr.windows;
 
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.OcrApp;
@@ -42,6 +43,12 @@ public class MainForm {
   private static StageInfo stageInfo;
   public static Stage stage;
   private static Scene mainScene;
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
   private static ScreenCapture screenCapture;
   private static ProcessController processController;
   private static TextArea textArea;
@@ -191,7 +198,8 @@ public class MainForm {
     processController.setX(CaptureInfo.ScreenMinX + (CaptureInfo.ScreenWidth - 300) / 2);
     processController.setY(250);
     processController.show();
-    Thread ocrThread = new Thread(() -> {
+
+    ThreadUtil.execute(() -> {
       byte[] bytes = CommUtils.imageToBytes(image);
       String text = null;
       try {
@@ -207,16 +215,13 @@ public class MainForm {
         restore(true);
       });
     });
-    ocrThread.setDaemon(false);
-    ocrThread.start();
   }
 
   public static void doOcr(File selectedFile) {
-    org.slf4j.Logger log = LoggerFactory.getLogger(OcrApp.class);
     processController.setX(CaptureInfo.ScreenMinX + (CaptureInfo.ScreenWidth - 300) / 2);
     processController.setY(250);
     processController.show();
-    Thread ocrThread = new Thread(() -> {
+    ThreadUtil.execute(() -> {
       String text = null;
       try {
         text = OcrUtils.recImgLocal(selectedFile);
@@ -224,18 +229,14 @@ public class MainForm {
         text = e.getMessage();
         e.printStackTrace();
       }
-      //log.info("识别结果:{}", text);
 
       String finalText = text;
       Platform.runLater(() -> {
         processController.close();
         textArea.setText(finalText);
-
         restore(true);
       });
     });
-    ocrThread.setDaemon(false);
-    ocrThread.start();
   }
 
   public static void restore(boolean focus) {
