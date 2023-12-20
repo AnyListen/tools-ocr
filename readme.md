@@ -11,6 +11,9 @@
 
 ## 开源地址
 [gitee](https://gitee.com/ppnt/tools-ocr) | [github](https://github.com/litongjava/tools-ocr)
+
+## required
+- Mac OS X 12.6 因为依赖djl 0.25.0
 ## 安装
 > - **安装路径请勿包含中文字符**；
 > - 本程序使用 JavaFX 开发，提供的安装包中已经包含了Java
@@ -43,10 +46,10 @@ wget https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch
 ```
 解压模型
 ```
-mkdir models/ch_PP-OCRv4_rec_infer-onnx
-mkdir models/ch_PP-OCRv4_det_infer-onnx
-unzip /Users/mac/Downloads/ch_PP-OCRv4_rec_infer-onnx.zip -d models/ch_PP-OCRv4_rec_infer-onnx
-unzip /Users/mac/Downloads/ch_PP-OCRv4_det_infer-onnx.zip -d models/ch_PP-OCRv4_det_infer-onnx
+mkdir models/ch_PP-OCRv4_rec_infer
+mkdir models/ch_PP-OCRv4_det_infer
+unzip /Users/mac/Downloads/ch_PP-OCRv4_rec_infer-onnx.zip -d models/ch_PP-OCRv4_rec_infer
+unzip /Users/mac/Downloads/ch_PP-OCRv4_det_infer-onnx.zip -d models/ch_PP-OCRv4_det_infer
 ```
 
 ### 构建程序
