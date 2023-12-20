@@ -77,6 +77,9 @@ cd treehole.app/Contents/java/logs
 ![1](readme_files/1.jpg)
 ![2](readme_files/2.jpg)
 
+## 常用目录
+- 日志目录/Applications/treehole.app/Contents/Java/logs
+- 临时图片保存目录 /Applications/treehole.app/Contents/Java
 ## TODO
 - [x] PDF识别
 - [x] 图片文字识别
