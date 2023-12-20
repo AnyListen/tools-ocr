@@ -9,7 +9,6 @@ import ai.djl.opencv.OpenCVImageFactory;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.TranslateException;
 import com.litongjava.djl.paddle.ocr.v4.common.RotatedBox;
 import com.litongjava.djl.paddle.ocr.v4.common.RotatedBoxCompX;
 import com.litongjava.djl.paddle.ocr.v4.detection.OcrV4Detection;

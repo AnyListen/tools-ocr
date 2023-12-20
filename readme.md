@@ -36,6 +36,20 @@
 ![](readme_files/4.jpg)
 
 ## 本地构建
+### 下载模型并解压
+```
+wget https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_rec_infer-onnx.zip
+wget https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_det_infer-onnx.zip
+```
+解压模型
+```
+mkdir models/ch_PP-OCRv4_rec_infer-onnx
+mkdir models/ch_PP-OCRv4_det_infer-onnx
+unzip /Users/mac/Downloads/ch_PP-OCRv4_rec_infer-onnx.zip -d models/ch_PP-OCRv4_rec_infer-onnx
+unzip /Users/mac/Downloads/ch_PP-OCRv4_det_infer-onnx.zip -d models/ch_PP-OCRv4_det_infer-onnx
+```
+
+### 构建程序
 你下载代码在本地进行构建,构建命令如下
 windows
 ```
@@ -52,6 +66,8 @@ cp -r models target/jfx/app
 mvn jfx:native -DskipTests -f pom.xml
 ```
 
+## 查看系统运行日志
+cd treehole.app/Contents/java/logs
 ## 注意事项
 ### MAC权限设置
 由于监控了截图快捷键，因此MAC需要开启相应的权限，请见下图：
