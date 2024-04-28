@@ -32,6 +32,5 @@ public enum PaddlePaddleOCRV4 {
   }
 
   public void close() {
-
   }
 }
