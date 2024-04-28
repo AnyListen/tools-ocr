@@ -1,6 +1,13 @@
 # 树洞 OCR 文字识别
-一款跨平台的 OCR 小工具,调用本地OCR进行识别,无需联网即可使用
-用到的技术和框架
+
+## 介绍
+  - 本地OCR识别
+    : 树洞OCR文字识别工具无需联网，通过调用本地OCR技术，基于Paddle OCR模型和深度学习框架如PyTorch、DJL，提供快速准确的文字识别。
+  - 跨平台兼容
+    : 基于java 1.8和JavaFX开发，支持在不同操作系统上运行，包括Mac OS X 12.6及以上版本。
+  - 强大的功能支持
+    : 除了基础的文字识别，还包括PDF识别、图片文字识别、快捷键截图识别等功能.
+## 主要依赖库
 - jdk 1.8
 - javafx
 - djl
@@ -12,8 +19,11 @@
 ## 开源地址
 [gitee](https://gitee.com/ppnt/tools-ocr) | [github](https://github.com/litongjava/tools-ocr)
 
+## document
+https://tree-hole-ocr-docs.vercel.app/
 ## required
 - Mac OS X 12.6 因为依赖djl 0.25.0
+
 ## 安装
 > - **安装路径请勿包含中文字符**；
 > - 本程序使用 JavaFX 开发，提供的安装包中已经包含了Java
