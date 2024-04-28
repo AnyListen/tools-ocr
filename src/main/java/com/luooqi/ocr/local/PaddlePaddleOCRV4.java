@@ -9,7 +9,6 @@ import ai.djl.opencv.OpenCVImageFactory;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.repository.zoo.ModelZoo;
 import ai.djl.repository.zoo.ZooModel;
-import ai.djl.translate.TranslateException;
 import com.litongjava.djl.paddle.ocr.v4.common.RotatedBox;
 import com.litongjava.djl.paddle.ocr.v4.common.RotatedBoxCompX;
 import com.litongjava.djl.paddle.ocr.v4.detection.OcrV4Detection;
@@ -27,36 +26,30 @@ import java.util.List;
  */
 public enum PaddlePaddleOCRV4 {
   INSTANCE;
-  private OcrV4Detection detection;
-  private OcrV4Recognition recognition;
-  private Predictor<Image, NDList> detector;
-  private Predictor<Image, String> recognizer;
-  private NDManager manager;
+  private static OcrV4Detection detection;
+  private static OcrV4Recognition recognition;
+  private static Predictor<Image, NDList> detector;
+  private static Predictor<Image, String> recognizer;
+  private static NDManager manager;
 
   PaddlePaddleOCRV4() {
-    detection = new OcrV4Detection();
-    recognition = new OcrV4Recognition();
-    ZooModel detectionModel = null;
-    ZooModel recognitionModel = null;
-    try {
-      detectionModel = ModelZoo.loadModel(detection.chDetCriteria());
-      recognitionModel = ModelZoo.loadModel(recognition.chRecCriteria());
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ModelNotFoundException e) {
-      e.printStackTrace();
-    } catch (MalformedModelException e) {
-      e.printStackTrace();
-    }
-    detector = detectionModel.newPredictor();
-
-    recognizer = recognitionModel.newPredictor();
-    manager = NDManager.newBaseManager();
   }
 
 
   //noting not to do.but init
-  public void init() {
+  public static void init() throws ModelNotFoundException, MalformedModelException, IOException {
+    detection = new OcrV4Detection();
+    recognition = new OcrV4Recognition();
+    ZooModel detectionModel = null;
+    ZooModel recognitionModel = null;
+
+    detectionModel = ModelZoo.loadModel(detection.chDetCriteria());
+    recognitionModel = ModelZoo.loadModel(recognition.chRecCriteria());
+
+    detector = detectionModel.newPredictor();
+
+    recognizer = recognitionModel.newPredictor();
+    manager = NDManager.newBaseManager();
 
   }
 

@@ -19,7 +19,7 @@ public class OcrApp extends Application {
   @Override
   public void init() throws Exception {
     super.init();
-    InitConfig.init();
+    //InitConfig.init();
   }
 
 

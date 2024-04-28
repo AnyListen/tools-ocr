@@ -1,6 +1,5 @@
 package com.luooqi.ocr.config;
 
-import com.luooqi.ocr.local.PaddlePaddleOCRV4;
 import com.luooqi.ocr.utils.GlobalKeyListener;
 import com.luooqi.ocr.utils.VoidDispatchService;
 import org.jnativehook.GlobalScreen;
@@ -23,7 +22,7 @@ public class InitConfig {
 //    map.put(ConfigKeys.recName, "ch_PP-OCRv3_rec_infer");
 //    map.put(ConfigKeys.keysName, "ppocr_keys_v1.txt");
 //    projectConfig.batchPut(map);
-    PaddlePaddleOCRV4.INSTANCE.init();
+
 
   }
 

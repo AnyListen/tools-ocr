@@ -1,11 +1,14 @@
 package com.luooqi.ocr.windows;
 
+import ai.djl.MalformedModelException;
+import ai.djl.repository.zoo.ModelNotFoundException;
 import cn.hutool.core.io.FileTypeUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.log.StaticLog;
 import com.luooqi.ocr.config.InitConfig;
 import com.luooqi.ocr.controller.ProcessController;
+import com.luooqi.ocr.local.PaddlePaddleOCRV4;
 import com.luooqi.ocr.model.CaptureInfo;
 import com.luooqi.ocr.model.StageInfo;
 import com.luooqi.ocr.snap.ScreenCapture;
@@ -30,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,6 +90,16 @@ public class MainForm {
     CommUtils.initStage(primaryStage);
     mainScene = new Scene(root, 670, 470);
     stage.setScene(mainScene);
+    //启动引擎,加载模型,如果模型加载错误下屏幕显示错误
+    try {
+      PaddlePaddleOCRV4.init();
+    } catch (ModelNotFoundException e) {
+      textArea.setText("加载模型出现错误" + e.getMessage());
+    } catch (MalformedModelException e) {
+      textArea.setText("加载模型出现错误" + e.getMessage());
+    } catch (IOException e) {
+      textArea.setText("加载模型出现错误" + e.getMessage());
+    }
   }
 
   private TextArea getCenter() {

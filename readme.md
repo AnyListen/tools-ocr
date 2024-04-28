@@ -1,6 +1,13 @@
 # 树洞 OCR 文字识别
-一款跨平台的 OCR 小工具,调用本地OCR进行识别,无需联网即可使用
-用到的技术和框架
+
+## 介绍
+  - 本地OCR识别
+    : 树洞OCR文字识别工具无需联网，通过调用本地OCR技术，基于Paddle OCR模型和深度学习框架如PyTorch、DJL，提供快速准确的文字识别。
+  - 跨平台兼容
+    : 基于java 1.8和JavaFX开发，支持在不同操作系统上运行，包括Mac OS X 12.6及以上版本。
+  - 强大的功能支持
+    : 除了基础的文字识别，还包括PDF识别、图片文字识别、快捷键截图识别等功能.
+## 主要依赖库
 - jdk 1.8
 - javafx
 - djl
@@ -11,6 +18,12 @@
 
 ## 开源地址
 [gitee](https://gitee.com/ppnt/tools-ocr) | [github](https://github.com/litongjava/tools-ocr)
+
+## document
+https://tree-hole-ocr-docs.vercel.app/
+## required
+- Mac OS X 12.6 因为依赖djl 0.25.0
+
 ## 安装
 > - **安装路径请勿包含中文字符**；
 > - 本程序使用 JavaFX 开发，提供的安装包中已经包含了Java
@@ -36,12 +49,38 @@
 ![](readme_files/4.jpg)
 
 ## 本地构建
+### 下载模型并解压
+```
+wget https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_rec_infer-onnx.zip
+wget https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_det_infer-onnx.zip
+```
+解压模型
+```
+mkdir models/ch_PP-OCRv4_rec_infer
+mkdir models/ch_PP-OCRv4_det_infer
+unzip /Users/mac/Downloads/ch_PP-OCRv4_rec_infer-onnx.zip -d models/ch_PP-OCRv4_rec_infer
+unzip /Users/mac/Downloads/ch_PP-OCRv4_det_infer-onnx.zip -d models/ch_PP-OCRv4_det_infer
+```
+
+### 构建程序
 你下载代码在本地进行构建,构建命令如下
+windows
 ```
 mkdir target\jfx\app
 cp -r models target\jfx\app
 mvn jfx:native -DskipTests -f pom.xml
 ```
+
+macos
+```shell script
+rm -rf target/jfx/app
+mkdir -p target/jfx/app
+cp -r models target/jfx/app
+mvn jfx:native -DskipTests -f pom.xml
+```
+
+## 查看系统运行日志
+cd treehole.app/Contents/java/logs
 ## 注意事项
 ### MAC权限设置
 由于监控了截图快捷键，因此MAC需要开启相应的权限，请见下图：
@@ -51,6 +90,9 @@ mvn jfx:native -DskipTests -f pom.xml
 ![1](readme_files/1.jpg)
 ![2](readme_files/2.jpg)
 
+## 常用目录
+- 日志目录/Applications/treehole.app/Contents/Java/logs
+- 临时图片保存目录 /Applications/treehole.app/Contents/Java
 ## TODO
 - [x] PDF识别
 - [x] 图片文字识别
