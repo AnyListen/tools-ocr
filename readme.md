@@ -1,60 +1,80 @@
-# 树洞 OCR 文字识别
+# Tree Hole OCR
 
-## 介绍
-  - 本地OCR识别
-    : 树洞OCR文字识别工具无需联网，通过调用本地OCR技术，基于Paddle OCR模型和深度学习框架如PyTorch、DJL，提供快速准确的文字识别。
-  - 跨平台兼容
-    : 基于java 1.8和JavaFX开发，支持在不同操作系统上运行，包括Mac OS X 12.6及以上版本。
-  - 强大的功能支持
-    : 除了基础的文字识别，还包括PDF识别、图片文字识别、快捷键截图识别等功能.
-## 主要依赖库
-- jdk 1.8
-- javafx
-- djl
-- pytorch
-- onnx
-- paddle ocr
-- opencv
+[English](./readme.md) | [中文](./readme-cn.md)
 
-## 开源地址
+## Introduction
+
+- Local OCR Recognition: Tree Hole OCR text recognition tool does not require internet connection. It leverages local OCR technology, based on Paddle OCR model and deep learning frameworks such as PyTorch, DJL, to provide fast and accurate text recognition.
+- Cross-platform compatibility: Developed with Java 1.8 and JavaFX, it supports operation on different operating systems, including Mac OS X 12.6 and above.
+- Powerful functionality: In addition to basic text recognition, it also includes PDF recognition, image text recognition, shortcut key screenshot recognition, and more.
+
+## Dependencies Library
+
+- JDK 1.8
+- JavaFX
+- DJL
+- PyTorch
+- ONNX
+- Paddle OCR
+- OpenCV
+
+## Open Source Address
+
 [gitee](https://gitee.com/ppnt/tools-ocr) | [github](https://github.com/litongjava/tools-ocr)
 
-## document
+## Documentation
+
 https://tree-hole-ocr-docs.vercel.app/
-## required
-- Mac OS X 12.6 因为依赖djl 0.25.0
 
-## 安装
-> - **安装路径请勿包含中文字符**；
-> - 本程序使用 JavaFX 开发，提供的安装包中已经包含了Java
-> - 从[release](https://github.com/litongjava/tools-ocr/releases/)下载最新版本解压安装即可
+## Requirements
 
+- Mac OS X 12.6 due to dependency on DJL 0.25.0
 
-## 程序使用
-### 启动截图
-- 方法一：在程序主界面点击截图按钮；
-- 方法二：点击截图快捷键 F4。
+## Installation
 
-### 圈选区域
-进入截图界面后，按下鼠标左键，然后拖动即可圈选所要截取的区域；
-圈选结束后，可以对圈选的区域进行微调：
-- 使用 **方向键**，可以对所选区域的右边界和上边界进行微调；
-- 使用 **Shift+方向键**，可以对所选区域的左边界和下边界进行微调；
-- 使用 **Ctrl+A**，可以全选整个屏幕。
+> - **Please do not include Chinese characters in the installation path**;
+> - This program is developed with JavaFX, and the installation package provided already includes Java.
+> - Download the latest version from [release](https://github.com/litongjava/tools-ocr/releases/) and unzip it for installation.
 
-### 确定圈选
-圈选完成后，点击 `Enter` 或者 `Space` 键，或者鼠标左键双击即可确认圈选；确认圈选后，会自动对所选区域进行 OCR 文字识别。
+## Using the Program
 
-![](readme_files/3.jpg)
-![](readme_files/4.jpg)
+### Screenshot
 
-## 本地构建
-### 下载模型并解压
+- Method one: Click the screenshot button on the main interface of the program;
+- Method two: Press the screenshot shortcut key F4.
+
+### Selecting Area
+
+After entering the screenshot interface, press and hold the left mouse button, then drag to select the area you want to capture;
+After completing the selection, you can fine-tune the selected area:
+
+- Use **arrow keys** to adjust the right and top borders of the selected area;
+- Use **Shift + arrow keys** to adjust the left and bottom borders of the selected area;
+- Use **Ctrl + A** to select the entire screen.
+
+### Confirm Selection
+
+After completing the selection, press `Enter` or `Space` key, or double-click the left mouse button to confirm the selection; Once confirmed, the program will automatically perform OCR text recognition on the selected area.
+
+- image
+
+  ![](readme_files/3.jpg)
+
+- result:
+
+  ![](readme_files/4.jpg)
+
+## Local Build
+
+### Download and Unzip the Models
+
 ```
 wget https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_rec_infer-onnx.zip
 wget https://github.com/litongjava/tools-ocr/releases/download/model-ppocr-v4/ch_PP-OCRv4_det_infer-onnx.zip
 ```
-解压模型
+
+Unzip the models
+
 ```
 mkdir models/ch_PP-OCRv4_rec_infer
 mkdir models/ch_PP-OCRv4_det_infer
@@ -62,9 +82,11 @@ unzip /Users/mac/Downloads/ch_PP-OCRv4_rec_infer-onnx.zip -d models/ch_PP-OCRv4_
 unzip /Users/mac/Downloads/ch_PP-OCRv4_det_infer-onnx.zip -d models/ch_PP-OCRv4_det_infer
 ```
 
-### 构建程序
-你下载代码在本地进行构建,构建命令如下
+### Build the Program
+
+You can download the code and build it locally. The build commands are as follows:
 windows
+
 ```
 mkdir target\jfx\app
 cp -r models target\jfx\app
@@ -72,6 +94,7 @@ mvn jfx:native -DskipTests -f pom.xml
 ```
 
 macos
+
 ```shell script
 rm -rf target/jfx/app
 mkdir -p target/jfx/app
@@ -79,29 +102,35 @@ cp -r models target/jfx/app
 mvn jfx:native -DskipTests -f pom.xml
 ```
 
-## 查看系统运行日志
+## View System Operating Log
+
 cd treehole.app/Contents/java/logs
-## 注意事项
-### MAC权限设置
-由于监控了截图快捷键，因此MAC需要开启相应的权限，请见下图：
 
-![MAC权限设置](http://img.ifish.fun/Fo31NZQIhPNF6m7gOorRGDuKvaZ_)
-笔者设置如下
-![1](readme_files/1.jpg)
-![2](readme_files/2.jpg)
+## Notices
 
-## 常用目录
-- 日志目录/Applications/treehole.app/Contents/Java/logs
-- 临时图片保存目录 /Applications/treehole.app/Contents/Java
+### MAC Permission Settings
+
+Since screenshot shortcuts are monitored, MAC needs appropriate permissions settings, as shown below:
+
+- Settings --> Security and Privacy --> Accessibility
+  ![MAC Permission Settings](readme_files/5.jpg)
+- Settings --> Security and Privacy --> Screen Recording
+  ![2](readme_files/2.jpg)
+
+## Common Directories
+
+- Log directory /Applications/treehole.app/Contents/Java/logs
+- Temporary image saving directory /Applications/treehole.app/Contents/Java
+
 ## TODO
-- [x] PDF识别
-- [x] 图片文字识别
-  - [x] 识别结果文本对齐（暂未实现多分栏）
-  - [x] 全屏模式下截图
-  - [x] 添加正在识别动画
-  - [x] 多屏支持
-- [ ] 文本翻译
-- [ ] 公式识别
-- [ ] 表格识别
-- [ ] 软件设置
 
+- [x] PDF Recognition
+- [x] Image Text Recognition
+  - [x] Recognition result text alignment (multi-column yet to be implemented)
+  - [x] Full screen mode screenshot
+  - [x] Adding recognition animation
+  - [x] Multi-screen support
+- [ ] Text Translation
+- [ ] Formula Recognition
+- [ ] Table Recognition
+- [ ] Software Settings
