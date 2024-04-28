@@ -1,7 +1,24 @@
 package com.luooqi.ocr.utils;
 
-import ai.djl.modality.cv.Image;
-import ai.djl.opencv.OpenCVImageFactory;
+import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.imageio.ImageIO;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
+import com.benjaminwan.ocrlibrary.OcrResult;
+import com.luooqi.ocr.local.PaddlePaddleOCRV4;
+import com.luooqi.ocr.model.TextBlock;
+
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.UUID;
@@ -17,28 +34,12 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.log.StaticLog;
-import com.benjaminwan.ocrlibrary.OcrResult;
-import com.luooqi.ocr.local.PaddlePaddleOCRV4;
-import com.luooqi.ocr.model.TextBlock;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.PDFRenderer;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.List;
-import java.util.*;
 
 /**
  * tools-ocr
  * Created by 何志龙 on 2019-03-22.
  */
 public class OcrUtils {
-
 
   public static String recImgLocal(byte[] imgData) {
     String path = "tmp_" + Math.abs(Arrays.hashCode(imgData)) + ".png";
@@ -54,7 +55,7 @@ public class OcrUtils {
   public static String recImgLocal(File file) {
     if (file.exists()) {
       try {
-        return PaddlePaddleOCRV4.INSTANCE.ocr(file);
+        return extractLocalResult(PaddlePaddleOCRV4.INSTANCE.ocr(file));
       } catch (Exception e) {
         e.printStackTrace();
         return e.getMessage();
@@ -62,7 +63,6 @@ public class OcrUtils {
     }
     return "文件不存在";
   }
-
 
   public static String recPdfLocal(File pdfFile) {
     if (pdfFile.exists()) {
@@ -90,19 +90,18 @@ public class OcrUtils {
     return null;
   }
 
-
   public static String ocrImg(byte[] imgData) {
     int i = Math.abs(UUID.randomUUID().hashCode()) % 4;
     StaticLog.info("OCR Engine: " + i);
     switch (i) {
-      case 0:
-        return bdGeneralOcr(imgData);
-      case 1:
-        return bdAccurateOcr(imgData);
-      case 2:
-        return sogouMobileOcr(imgData);
-      default:
-        return sogouWebOcr(imgData);
+    case 0:
+      return bdGeneralOcr(imgData);
+    case 1:
+      return bdAccurateOcr(imgData);
+    case 2:
+      return sogouMobileOcr(imgData);
+    default:
+      return sogouWebOcr(imgData);
     }
   }
 
@@ -115,7 +114,8 @@ public class OcrUtils {
   }
 
   private static String bdBaseOcr(byte[] imgData, String type) {
-    String[] urlArr = new String[]{"http://ai.baidu.com/tech/ocr/general", "http://ai.baidu.com/index/seccode?action=show"};
+    String[] urlArr = new String[] { "http://ai.baidu.com/tech/ocr/general",
+        "http://ai.baidu.com/index/seccode?action=show" };
     StringBuilder cookie = new StringBuilder();
     for (String url : urlArr) {
       HttpResponse cookieResp = WebUtils.get(url);
@@ -129,7 +129,8 @@ public class OcrUtils {
     HashMap<String, String> header = new HashMap<>();
     header.put("Referer", "http://ai.baidu.com/tech/ocr/general");
     header.put("Cookie", cookie.toString());
-    String data = "type=" + URLUtil.encodeQuery(type) + "&detect_direction=false&image_url&image=" + URLUtil.encodeQuery("data:image/jpeg;base64," + Base64.encode(imgData)) + "&language_type=CHN_ENG";
+    String data = "type=" + URLUtil.encodeQuery(type) + "&detect_direction=false&image_url&image="
+        + URLUtil.encodeQuery("data:image/jpeg;base64," + Base64.encode(imgData)) + "&language_type=CHN_ENG";
     HttpResponse response = WebUtils.postRaw("http://ai.baidu.com/aidemo", data, 0, header);
     return extractBdResult(WebUtils.getSafeHtml(response));
   }
@@ -137,9 +138,11 @@ public class OcrUtils {
   public static String sogouMobileOcr(byte[] imgData) {
     String boundary = "------WebKitFormBoundary8orYTmcj8BHvQpVU";
     String url = "http://ocr.shouji.sogou.com/v2/ocr/json";
-    String header = boundary + "\r\nContent-Disposition: form-data; name=\"pic\"; filename=\"pic.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
+    String header = boundary
+        + "\r\nContent-Disposition: form-data; name=\"pic\"; filename=\"pic.jpg\"\r\nContent-Type: image/jpeg\r\n\r\n";
     String footer = "\r\n" + boundary + "--\r\n";
-    byte[] postData = CommUtils.mergeByte(header.getBytes(CharsetUtil.CHARSET_ISO_8859_1), imgData, footer.getBytes(CharsetUtil.CHARSET_ISO_8859_1));
+    byte[] postData = CommUtils.mergeByte(header.getBytes(CharsetUtil.CHARSET_ISO_8859_1), imgData,
+        footer.getBytes(CharsetUtil.CHARSET_ISO_8859_1));
     return extractSogouResult(CommUtils.postMultiData(url, postData, boundary.substring(2)));
   }
 
@@ -148,7 +151,8 @@ public class OcrUtils {
     String referer = "https://deepi.sogou.com/?from=picsearch&tdsourcetag=s_pctim_aiomsg";
     String imageData = Base64.encode(imgData);
     long t = System.currentTimeMillis();
-    String sign = SecureUtil.md5("sogou_ocr_just_for_deepibasicOpenOcr" + t + imageData.substring(0, Math.min(1024, imageData.length())) + "4b66a37108dab018ace616c4ae07e644");
+    String sign = SecureUtil.md5("sogou_ocr_just_for_deepibasicOpenOcr" + t
+        + imageData.substring(0, Math.min(1024, imageData.length())) + "4b66a37108dab018ace616c4ae07e644");
     Map<String, Object> data = new HashMap<>();
     data.put("image", imageData);
     data.put("lang", "zh-Chs");
@@ -178,7 +182,7 @@ public class OcrUtils {
       JSONObject jObj = jsonArray.getJSONObject(i);
       TextBlock textBlock = new TextBlock();
       textBlock.setText(jObj.getStr("content").trim());
-      //noinspection SuspiciousToArrayCall
+      // noinspection SuspiciousToArrayCall
       String[] frames = jObj.getJSONArray("frame").toArray(new String[0]);
       textBlock.setTopLeft(CommUtils.frameToPoint(frames[0]));
       textBlock.setTopRight(CommUtils.frameToPoint(frames[1]));
@@ -205,7 +209,7 @@ public class OcrUtils {
       JSONObject jObj = jsonArray.getJSONObject(i);
       TextBlock textBlock = new TextBlock();
       textBlock.setText(jObj.getStr("words").trim());
-      //noinspection SuspiciousToArrayCall
+      // noinspection SuspiciousToArrayCall
       JSONObject location = jObj.getJSONObject("location");
       int top = location.getInt("top");
       int left = location.getInt("left");
@@ -219,7 +223,6 @@ public class OcrUtils {
     }
     return CommUtils.combineTextBlocks(textBlocks, isEng);
   }
-
 
   private static String extractLocalResult(OcrResult ocrResult) {
     if (ocrResult == null) {
@@ -239,6 +242,5 @@ public class OcrUtils {
     }
     return CommUtils.combineTextBlocks(textBlocks, isEng);
   }
-
 
 }

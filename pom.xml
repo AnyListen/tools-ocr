@@ -6,7 +6,7 @@
 
   <groupId>com.luooqi</groupId>
   <artifactId>tools-ocr</artifactId>
-  <version>2.2.9</version>
+  <version>2.3.0</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -57,41 +57,17 @@
       <version>${logback.version}</version>
     </dependency>
 
-    <!-- 服务器端推理引擎 -->
+    <!--rapidocr-->
     <dependency>
-      <groupId>ai.djl</groupId>
-      <artifactId>api</artifactId>
-      <version>${djl.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>ai.djl</groupId>
-      <artifactId>basicdataset</artifactId>
-      <version>${djl.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>ai.djl</groupId>
-      <artifactId>model-zoo</artifactId>
-      <version>${djl.version}</version>
-    </dependency>
-
-    <!-- ONNX 无NDArray ，需要借用pytorch-->
-    <dependency>
-      <groupId>ai.djl.pytorch</groupId>
-      <artifactId>pytorch-engine</artifactId>
-      <version>${djl.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- ONNX -->
-    <dependency>
-      <groupId>ai.djl.onnxruntime</groupId>
-      <artifactId>onnxruntime-engine</artifactId>
-      <version>${djl.version}</version>
+      <groupId>io.github.mymonstercat</groupId>
+      <artifactId>rapidocr</artifactId>
+      <version>0.0.7</version>
     </dependency>
 
     <dependency>
-      <groupId>ai.djl.opencv</groupId>
-      <artifactId>opencv</artifactId>
-      <version>${djl.version}</version>
+      <groupId>io.github.mymonstercat</groupId>
+      <artifactId>rapidocr-onnx-platform</artifactId>
+      <version>0.0.7</version>
     </dependency>
 
     <dependency>

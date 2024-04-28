@@ -1,11 +1,10 @@
 package com.luooqi.ocr.windows;
 
-import ai.djl.MalformedModelException;
-import ai.djl.repository.zoo.ModelNotFoundException;
-import cn.hutool.core.io.FileTypeUtil;
-import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.log.StaticLog;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.luooqi.ocr.config.InitConfig;
 import com.luooqi.ocr.controller.ProcessController;
 import com.luooqi.ocr.local.PaddlePaddleOCRV4;
@@ -14,6 +13,11 @@ import com.luooqi.ocr.model.StageInfo;
 import com.luooqi.ocr.snap.ScreenCapture;
 import com.luooqi.ocr.utils.CommUtils;
 import com.luooqi.ocr.utils.OcrUtils;
+
+import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.log.StaticLog;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
@@ -23,19 +27,19 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by litonglinux@qq.com on 12/9/2023_4:40 PM
@@ -54,8 +58,8 @@ public class MainForm {
   private static ScreenCapture screenCapture;
   private static ProcessController processController;
   private static TextArea textArea;
-  //private static boolean isSegment = true;
-  //private static String ocrText = "";
+  // private static boolean isSegment = true;
+  // private static String ocrText = "";
 
   public void init(Stage primaryStage) {
 
@@ -84,21 +88,15 @@ public class MainForm {
     root.setTop(topBar);
     root.setCenter(textArea);
     root.setBottom(footerBar);
-    root.getStylesheets().addAll(
-      getClass().getResource("/css/main.css").toExternalForm()
-    );
+    root.getStylesheets().addAll(getClass().getResource("/css/main.css").toExternalForm());
     CommUtils.initStage(primaryStage);
     mainScene = new Scene(root, 670, 470);
     stage.setScene(mainScene);
-    //启动引擎,加载模型,如果模型加载错误下屏幕显示错误
+    // 启动引擎,加载模型,如果模型加载错误下屏幕显示错误
     try {
       PaddlePaddleOCRV4.init();
-    } catch (ModelNotFoundException e) {
-      textArea.setText("加载模型出现错误" + e.getMessage());
-    } catch (MalformedModelException e) {
-      textArea.setText("加载模型出现错误" + e.getMessage());
-    } catch (IOException e) {
-      textArea.setText("加载模型出现错误" + e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -106,7 +104,8 @@ public class MainForm {
     TextArea textArea = new TextArea();
     textArea.setId("ocrTextArea");
     textArea.setWrapText(true);
-    textArea.setBorder(new Border(new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+    textArea.setBorder(
+        new Border(new BorderStroke(Color.DARKGRAY, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
     textArea.setFont(Font.font("Arial", FontPosture.REGULAR, 14));
     return textArea;
   }
@@ -116,21 +115,21 @@ public class MainForm {
     footerBar.setId("statsToolbar");
     Label statsLabel = new Label();
     SimpleStringProperty statsProperty = new SimpleStringProperty("总字数：0");
-    textArea.textProperty().addListener((observable, oldValue, newValue) -> statsProperty.set("总字数：" + newValue.replaceAll(CommUtils.SPECIAL_CHARS, "").length()));
+    textArea.textProperty().addListener((observable, oldValue, newValue) -> statsProperty
+        .set("总字数：" + newValue.replaceAll(CommUtils.SPECIAL_CHARS, "").length()));
     statsLabel.textProperty().bind(statsProperty);
     footerBar.getItems().add(statsLabel);
     return footerBar;
   }
 
   private HBox getTopBar() {
-    HBox topBar = new HBox(
-      CommUtils.createButton("snapBtn", MainForm::screenShotOcr, "截图"),
-      CommUtils.createButton("openImageBtn", this::openImageOcr, "打开"),
-      CommUtils.createButton("copyBtn", this::copyText, "复制"),
-      CommUtils.createButton("pasteBtn", this::pasteText, "粘贴"),
-      CommUtils.createButton("clearBtn", this::clearText, "清空"),
-      CommUtils.createButton("wrapBtn", this::wrapText, "换行")
-      //CommUtils.SEPARATOR, resetBtn, segmentBtn
+    HBox topBar = new HBox(CommUtils.createButton("snapBtn", MainForm::screenShotOcr, "截图"),
+        CommUtils.createButton("openImageBtn", this::openImageOcr, "打开"),
+        CommUtils.createButton("copyBtn", this::copyText, "复制"),
+        CommUtils.createButton("pasteBtn", this::pasteText, "粘贴"),
+        CommUtils.createButton("clearBtn", this::clearText, "清空"),
+        CommUtils.createButton("wrapBtn", this::wrapText, "换行")
+    // CommUtils.SEPARATOR, resetBtn, segmentBtn
     );
     topBar.setId("topBar");
     topBar.setMinHeight(40);
@@ -157,7 +156,6 @@ public class MainForm {
     textArea.setWrapText(!textArea.isWrapText());
   }
 
-
   private void clearText() {
     textArea.setText("");
   }
@@ -167,9 +165,8 @@ public class MainForm {
     if (StrUtil.isBlank(text)) {
       return;
     }
-    textArea.setText(textArea.getText()
-      + (StrUtil.isBlank(textArea.getText()) ? "" : "\n")
-      + Clipboard.getSystemClipboard().getString());
+    textArea.setText(textArea.getText() + (StrUtil.isBlank(textArea.getText()) ? "" : "\n")
+        + Clipboard.getSystemClipboard().getString());
   }
 
   private void copyText() {
@@ -198,23 +195,21 @@ public class MainForm {
   private void openImageOcr() {
     FileChooser fileChooser = new FileChooser();
     fileChooser.setTitle("Please Select Image File");
-    String[] extensions = {"*.png", "*.jpg", "*.pdf", "*.PDF"};
+    String[] extensions = { "*.png", "*.jpg", "*.pdf", "*.PDF" };
     fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Image Files", extensions));
     File selectedFile = fileChooser.showOpenDialog(stage);
     if (selectedFile == null || !selectedFile.isFile()) {
       return;
     }
-    stageInfo = new StageInfo(stage.getX(), stage.getY(),
-      stage.getWidth(), stage.getHeight(), stage.isFullScreen());
+    stageInfo = new StageInfo(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight(), stage.isFullScreen());
 
     try {
-      //BufferedImage image = ImageIO.read(selectedFile);
+      // BufferedImage image = ImageIO.read(selectedFile);
       doOcr(selectedFile);
     } catch (Exception e) {
       StaticLog.error(e);
     }
   }
-
 
   public static void cancelSnap() {
     Platform.runLater(screenCapture::cancelSnap);
