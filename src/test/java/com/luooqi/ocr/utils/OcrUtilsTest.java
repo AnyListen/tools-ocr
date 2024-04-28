@@ -1,20 +1,12 @@
 package com.luooqi.ocr.utils;
 
-import cn.hutool.core.swing.ScreenUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import com.luooqi.ocr.model.TextBlock;
-import javafx.scene.SnapshotParameters;
-import org.junit.Test;
-
-import java.awt.*;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
 import java.awt.geom.AffineTransform;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+
+import org.junit.Test;
 
 public class OcrUtilsTest {
 
@@ -32,7 +24,8 @@ public class OcrUtilsTest {
 
   @Test
   public void sogouWebOcr() {
-    GraphicsConfiguration asdf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+    GraphicsConfiguration asdf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+        .getDefaultConfiguration();
     AffineTransform asfd2 = asdf.getDefaultTransform();
     double scaleX = asfd2.getScaleX();
     double scaleY = asfd2.getScaleY();
@@ -46,7 +39,7 @@ public class OcrUtilsTest {
   }
 
   @Test
-  public void recImageLocal(){
+  public void recImageLocal() {
     OcrUtils.recImgLocal(new File("temp_1010298_4.png"));
   }
 }

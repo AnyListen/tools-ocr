@@ -1,6 +1,7 @@
 package com.luooqi.ocr.controller;
 
 import com.luooqi.ocr.utils.CommUtils;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
